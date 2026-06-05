@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  passwordHash  String?
+  credits       Int       @default(5)
+  role          String    @default("user")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  listings      Listing[]
+  videos        Video[]
+  creditEvents  CreditEvent[]
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  price       String?
+  location    String?
+  bedrooms    Int?
+  bathrooms   Int?
+  sqft        Int?
+  propertyType String?
+  description String?
+  features    String[]
+  photos      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  videos      Video[]
+
+  @@index([userId, createdAt])
+}
+
+model Video {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId    String?
+  listing      Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  videoMode    String   @default("basic")
+  provider     String   @default("fal")
+  model        String?
+  status       String   @default("pending")
+  format       String
+  duration     Int
+  style        String?
+  imageUrl     String?
+  selectedImageIds String[] @default([])
+  selectedImageUrls String[] @default([])
+  prompt       String?  @db.Text
+  negativePrompt String? @db.Text
+  falJobId     String?  @unique
+  videoUrl     String?
+  thumbnailUrl String?
+  creditsCharged Int    @default(0)
+  providerCostEstimate Float?
+  overlays     Json?
+  scenePlan    Json?
+  providerRequests Json?
+  errorMessage String?  @db.Text
+  rawProviderResponse Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([listingId, createdAt])
+  @@index([status])
+  @@index([provider])
+  @@index([videoMode])
+}
+
+model CreditEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  action    String
+  note      String?
+  referenceId String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([referenceId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

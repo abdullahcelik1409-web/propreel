@@ -1,30 +1,12 @@
-import { cookies } from "next/headers";
-import AgentEditClient from "./AgentEditClient";
-
-const BASE_URL = 'https://api.muapi.ai';
-
-async function fetchUserData(apiKey) {
-  if (!apiKey) return null;
-  try {
-    const res = await fetch(`${BASE_URL}/api/v1/account/balance`, {
-      cache: "no-store",
-      headers: { "x-api-key": apiKey },
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
-export default async function EditAgentPage({ params }) {
-  const { id } = await params; // although we don't use id on server here, it's used by useParams in client
-  const cookieStore = await cookies();
-  const apiKey = cookieStore.get("muapi_key")?.value;
-
-  const userData = await fetchUserData(apiKey);
-
+export default function EditAgentPage() {
   return (
-    <AgentEditClient userData={userData} />
+    <main className="min-h-screen bg-[#030303] text-white flex items-center justify-center px-6">
+      <div className="max-w-md text-center">
+        <h1 className="text-2xl font-bold mb-3">Agent editing is disabled</h1>
+        <p className="text-sm text-white/50">
+          The legacy agent backend has been disabled for Part 1. Fal.ai video generation is available through the studio foundation.
+        </p>
+      </div>
+    </main>
   );
 }

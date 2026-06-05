@@ -1,0 +1,51 @@
+import CreditBadge from "@/components/CreditBadge";
+import { prisma } from "@/lib/prisma";
+import { getSessionUser } from "@/lib/session";
+import { CREDIT_PACKAGES } from "@/lib/videoConfig";
+
+export const dynamic = "force-dynamic";
+
+export default async function CreditsPage() {
+  const user = await getSessionUser();
+  const events = await prisma.creditEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50 });
+
+  return (
+    <div className="space-y-6">
+      <div className="pr-section p-6">
+        <p className="pr-kicker">Current balance</p>
+        <div className="mt-3"><CreditBadge credits={user.credits} /></div>
+      </div>
+      <div className="rounded-lg border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)]">
+        Payment integration coming soon - contact us for bulk credits.
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        {CREDIT_PACKAGES.map((pack) => (
+          <div key={pack.id} className="pr-section-flat p-4">
+            <p className="font-semibold">{pack.name}</p>
+            <p className="mt-2 text-2xl font-black tabular-nums">{pack.credits} credits</p>
+            <p className="mt-1 text-sm font-bold text-[var(--pr-cyan)]">${pack.priceUsd}</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
+          </div>
+        ))}
+      </div>
+      <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-[#071010] text-[var(--pr-muted)]">
+            <tr><th className="p-3">Date</th><th className="p-3">Action</th><th className="p-3">Credits</th><th className="p-3">Note</th></tr>
+          </thead>
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.id} className="border-t border-[var(--pr-border-soft)]">
+                <td className="p-3 text-[var(--pr-muted)]">{new Date(event.createdAt).toLocaleString()}</td>
+                <td className="p-3">{event.action}</td>
+                <td className={`p-3 font-semibold ${event.amount > 0 ? "text-emerald-300" : "text-amber-200"}`}>{event.amount}</td>
+                <td className="p-3 text-[var(--pr-muted)]">{event.note || "-"}</td>
+              </tr>
+            ))}
+            {!events.length && <tr><td className="p-6 text-center text-[var(--pr-muted)]" colSpan={4}>No usage history yet.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
