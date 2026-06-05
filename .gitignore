@@ -39,3 +39,5 @@ out/
 !.env.example
 supabase/.temp/
 .tools/
+
+.vercel
