@@ -7,11 +7,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** @type {import('next').NextConfig} */
 const createNextConfig = (phase) => {
   const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+  const isVercel = Boolean(process.env.VERCEL);
 
   return {
     transpilePackages: ['studio', 'ai-agent', 'workflow-builder', 'design-agent'],
     outputFileTracingRoot: __dirname,
-    distDir: isDev ? '.next' : '.next-build',
+    distDir: isDev || isVercel ? '.next' : '.next-build',
   };
 };
 
