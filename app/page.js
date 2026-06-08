@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MarketingNav from "@/components/MarketingNav";
 
 const features = [
   ["Upload Photos", "Add up to 15 property photos and keep them ready for video generation."],
@@ -10,15 +11,7 @@ const features = [
 export default function LandingPage() {
   return (
     <main className="pr-shell min-h-screen">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--pr-cyan)] text-sm font-black text-[#002020]">PR</span>
-          <span className="text-lg font-bold tracking-tight">PropReel</span>
-        </Link>
-        <Link href="/auth/login" className="pr-secondary px-4 py-2 text-sm font-semibold">
-          Login
-        </Link>
-      </nav>
+      <MarketingNav />
 
       <section className="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
         <div className="flex flex-col justify-center">
@@ -71,9 +64,12 @@ export default function LandingPage() {
           ))}
         </div>
         <div className="pr-section mt-6 p-6 text-center">
-          <p className="text-sm font-bold text-[var(--pr-cyan)]">Pricing teaser</p>
+          <p className="text-sm font-bold text-[var(--pr-cyan)]">Credit packages</p>
           <h2 className="mt-2 text-2xl font-bold">Start free, scale when your listings do.</h2>
-          <p className="mt-2 text-[var(--pr-muted)]">Payment integration is coming soon. Contact us for bulk credits.</p>
+          <p className="mt-2 text-[var(--pr-muted)]">View transparent USD pricing before buying digital video credits.</p>
+          <Link href="/pricing" className="pr-primary mt-5 inline-flex px-5 py-3 text-center">
+            View Pricing
+          </Link>
         </div>
       </section>
     </main>

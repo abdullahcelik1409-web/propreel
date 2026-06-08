@@ -2,6 +2,7 @@ import CreditBadge from "@/components/CreditBadge";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
 import { CREDIT_PACKAGES } from "@/lib/videoConfig";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,11 @@ export default async function CreditsPage() {
         <p className="pr-kicker">Current balance</p>
         <div className="mt-3"><CreditBadge credits={user.credits} /></div>
       </div>
-      <div className="rounded-lg border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)]">
-        Payment integration coming soon - contact us for bulk credits.
+      <div className="flex flex-col gap-3 rounded-lg border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)] md:flex-row md:items-center md:justify-between">
+        <span>Buy digital credits through secure iyzico payment links.</span>
+        <Link href="/pricing" className="pr-primary px-4 py-2 text-center text-sm">
+          View Pricing
+        </Link>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {CREDIT_PACKAGES.map((pack) => (
