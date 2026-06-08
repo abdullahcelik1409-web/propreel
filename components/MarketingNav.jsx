@@ -25,9 +25,14 @@ export default async function MarketingNav() {
             Dashboard
           </Link>
         ) : (
-          <Link href="/auth/login" className="pr-secondary px-4 py-2 text-sm font-semibold">
-            Login
-          </Link>
+          <>
+            <Link href="/auth/login" className="pr-secondary px-4 py-2 text-sm font-semibold">
+              Login
+            </Link>
+            <Link href="/auth/register" className="rounded-md border border-[var(--pr-cyan)]/35 px-3 py-2 text-sm font-black text-[var(--pr-cyan)] transition hover:bg-[var(--pr-cyan-soft)] sm:px-4">
+              Sign up →
+            </Link>
+          </>
         )}
       </div>
     </nav>

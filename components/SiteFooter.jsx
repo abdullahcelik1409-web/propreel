@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { LEGAL_LINKS, MARKETING_NAV_LINKS, PAYMENT_NOTICE, SELLER_INFO } from "@/lib/siteContent";
+import { LEGAL_LINKS, PAYMENT_NOTICE, SELLER_INFO } from "@/lib/siteContent";
+
+const productLinks = [
+  ["Home", "/"],
+  ["Pricing", "/pricing"],
+  ["Contact", "/contact"],
+  ["Dashboard", "/dashboard"],
+];
 
 export default function SiteFooter() {
   return (
@@ -10,13 +17,13 @@ export default function SiteFooter() {
             <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--pr-cyan)] text-sm font-black text-[#002020]">PR</span>
             <span className="text-lg font-bold tracking-tight">PropReel</span>
           </Link>
-          <p className="mt-3 max-w-sm leading-6">AI real estate video credits for agents and agencies.</p>
+          <p className="mt-3 max-w-sm leading-6">AI-powered property video production for real estate agents</p>
         </div>
 
         <nav aria-label="Footer navigation">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--pr-dim)]">Navigation</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--pr-dim)]">Product</p>
           <div className="mt-4 flex flex-col gap-2">
-            {MARKETING_NAV_LINKS.map(([label, href]) => (
+            {productLinks.map(([label, href]) => (
               <Link key={href} href={href} className="transition hover:text-white">
                 {label}
               </Link>
@@ -37,7 +44,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-3 border-t border-[var(--pr-border-soft)] pt-6 md:flex-row md:items-center md:justify-between">
-        <p className="leading-6">{SELLER_INFO.footerLine}</p>
+        <p className="leading-6">© 2025 PropReel · {SELLER_INFO.footerLine}</p>
         <p className="rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-3 py-2 text-xs font-bold text-[var(--pr-cyan)]">
           {PAYMENT_NOTICE}
         </p>
