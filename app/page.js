@@ -153,7 +153,7 @@ export default function LandingPage() {
             <p className="text-sm font-bold text-[var(--pr-cyan)]">Credit packages</p>
             <h2 className="mt-2 text-2xl font-bold">Start free, scale when your listings do.</h2>
           </div>
-          <PricingPlans packages={packages} action="link" compact />
+          <PricingPlans packages={packages} compact />
         </div>
       </section>
     </main>

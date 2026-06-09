@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 
 function PlanIcon({ id }) {
@@ -43,7 +42,7 @@ function LockIcon() {
   );
 }
 
-export default function PricingPlans({ packages, action = "modal", compact = false }) {
+export default function PricingPlans({ packages, compact = false }) {
   const [selectedPackage, setSelectedPackage] = useState(null);
 
   return (
@@ -87,11 +86,7 @@ export default function PricingPlans({ packages, action = "modal", compact = fal
                   ))}
                 </ul>
               )}
-              {action === "link" ? (
-                <Link href="/pricing" className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
-                  <LockIcon /> Buy Now
-                </Link>
-              ) : hasPaymentUrl ? (
+              {hasPaymentUrl ? (
                 <a href={pack.paymentUrl} target="_blank" rel="noopener noreferrer" className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
                   <LockIcon /> Buy Now
                 </a>

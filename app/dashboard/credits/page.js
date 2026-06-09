@@ -1,4 +1,5 @@
 import CreditBadge from "@/components/CreditBadge";
+import PricingPlans from "@/components/PricingPlans";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
 import { getCreditPackagesWithPaymentLinks } from "@/lib/paymentConfig";
@@ -9,7 +10,10 @@ export const dynamic = "force-dynamic";
 export default async function CreditsPage() {
   const user = await getSessionUser();
   const events = await prisma.creditEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50 });
-  const packages = getCreditPackagesWithPaymentLinks();
+  const packages = getCreditPackagesWithPaymentLinks().map((pack) => ({
+    ...pack,
+    features: ["Secure iyzico payment link", "Digital credit delivery after payment", "No subscription"],
+  }));
 
   return (
     <div className="space-y-6">
@@ -23,24 +27,8 @@ export default async function CreditsPage() {
           View Pricing
         </Link>
       </div>
-      <div className="grid gap-3 md:grid-cols-3">
-        {packages.map((pack) => (
-          <div key={pack.id} className="pr-section-flat p-4">
-            <p className="font-semibold">{pack.name}</p>
-            <p className="mt-2 text-2xl font-black tabular-nums">{pack.credits} credits</p>
-            <p className="mt-1 text-sm font-bold text-[var(--pr-cyan)]">${pack.priceUsd}</p>
-            <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
-            {pack.paymentUrl ? (
-              <a href={pack.paymentUrl} target="_blank" rel="noopener noreferrer" className="pr-primary mt-4 inline-flex w-full justify-center px-4 py-2 text-sm">
-                Buy with iyzico
-              </a>
-            ) : (
-              <Link href="/pricing" className="pr-secondary mt-4 inline-flex w-full justify-center px-4 py-2 text-sm font-semibold">
-                View purchase details
-              </Link>
-            )}
-          </div>
-        ))}
+      <div>
+        <PricingPlans packages={packages} compact />
       </div>
       <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
         <table className="w-full text-left text-sm">
