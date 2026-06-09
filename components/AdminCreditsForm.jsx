@@ -30,7 +30,7 @@ export default function AdminCreditsForm({ email }) {
         credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
-          "X-Requested-With": "propreel-admin",
+          "X-Requested-With": "viseo-admin",
         },
         body: JSON.stringify({ email, amount: parsedAmount }),
       });

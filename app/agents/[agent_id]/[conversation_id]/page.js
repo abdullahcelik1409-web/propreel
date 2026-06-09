@@ -1,6 +1,6 @@
 export async function generateMetadata() {
   return {
-    title: 'Agent disabled - Open Generative AI',
+    title: 'Agent disabled - Viseo',
   };
 }
 

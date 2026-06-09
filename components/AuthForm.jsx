@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function AuthForm({ mode, googleEnabled = false }) {
   const router = useRouter();
@@ -47,7 +48,9 @@ export default function AuthForm({ mode, googleEnabled = false }) {
   return (
     <div className="pr-shell min-h-screen px-6 py-10">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col justify-center">
-        <Link href="/" className="mb-8 flex justify-center text-2xl font-black tracking-tight">PropReel</Link>
+        <Link href="/" className="mb-8 flex justify-center" aria-label="Viseo home">
+          <BrandLogo size="lg" />
+        </Link>
         <div className="pr-section p-6 shadow-2xl">
           <p className="pr-kicker text-[var(--pr-cyan)]">Agent workspace</p>
           <h1 className="mt-2 text-2xl font-black tracking-tight">{isRegister ? "Start free with starter credits" : "Welcome back"}</h1>
@@ -106,7 +109,7 @@ export default function AuthForm({ mode, googleEnabled = false }) {
           </form>
 
           <p className="mt-6 text-center text-sm text-[var(--pr-muted)]">
-            {isRegister ? "Already have an account?" : "New to PropReel?"}{" "}
+            {isRegister ? "Already have an account?" : "New to Viseo?"}{" "}
             <Link href={isRegister ? "/auth/login" : "/auth/register"} className="font-semibold text-[var(--pr-cyan)]">
               {isRegister ? "Login" : "Start free"}
             </Link>

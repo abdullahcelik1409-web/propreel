@@ -3,7 +3,7 @@ import MarketingNav from "@/components/MarketingNav";
 import { legalDocuments } from "@/lib/legalDocuments";
 
 export const metadata = {
-  title: "Distance Sales Agreement - PropReel",
+  title: "Distance Sales Agreement - Viseo",
 };
 
 export default function DistanceSalesContractPage() {

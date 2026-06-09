@@ -2,12 +2,12 @@ import MarketingNav from "@/components/MarketingNav";
 import { PRODUCT_SUMMARY, SELLER_INFO } from "@/lib/siteContent";
 
 export const metadata = {
-  title: "Contact - PropReel",
-  description: "Contact PropReel seller support for digital real estate video credits.",
+  title: "Contact - Viseo",
+  description: "Contact Viseo seller support for digital real estate video credits.",
 };
 
 const phoneHref = `tel:${SELLER_INFO.phone.replace(/\s/g, "")}`;
-const mailHref = `mailto:${SELLER_INFO.email}?subject=PropReel%20support`;
+const mailHref = `mailto:${SELLER_INFO.email}?subject=Viseo%20support`;
 
 export default function ContactPage() {
   return (
@@ -17,7 +17,7 @@ export default function ContactPage() {
         <div className="space-y-6">
           <div>
             <p className="pr-kicker">Contact</p>
-            <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Contact PropReel</h1>
+            <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Contact Viseo</h1>
             <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
               Reach us for questions about digital credit packages, AI video generation, refunds, and account support.
             </p>
@@ -46,7 +46,7 @@ export default function ContactPage() {
           </div>
 
           <div className="pr-section-flat p-5">
-            <h2 className="text-xl font-black">About PropReel</h2>
+            <h2 className="text-xl font-black">About Viseo</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--pr-muted)]">{PRODUCT_SUMMARY}</p>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function ContactPage() {
 
           <div className="mt-6 grid gap-3">
             <a href={mailHref} className="pr-primary inline-flex justify-center px-5 py-3 text-sm">
-              Email PropReel Support
+              Email Viseo Support
             </a>
             <a href={phoneHref} className="pr-secondary inline-flex justify-center px-5 py-3 text-sm font-semibold">
               Call Seller

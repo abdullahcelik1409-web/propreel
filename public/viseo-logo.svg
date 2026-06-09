@@ -1,0 +1,10 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Viseo logo</title>
+  <desc id="desc">A square Viseo logo with a minimal V mark, viewport frame, and wordmark.</desc>
+  <rect width="1024" height="1024" rx="96" fill="#071010"/>
+  <rect x="42" y="42" width="940" height="940" rx="74" fill="none" stroke="#00FBFB" stroke-opacity="0.18" stroke-width="4"/>
+  <path d="M412 356L512 456L612 356M362 410L512 560L662 410" stroke="#00FBFB" stroke-width="48" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M312 310H712V610H312V310Z" stroke="#F7FAF8" stroke-width="24" fill="none" opacity="0.18"/>
+  <circle cx="512" cy="460" r="154" fill="#00FBFB" opacity="0.06"/>
+  <text x="512" y="800" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="120" font-weight="800" fill="#F7FAF8" text-anchor="middle" letter-spacing="-0.02em">Viseo</text>
+</svg>

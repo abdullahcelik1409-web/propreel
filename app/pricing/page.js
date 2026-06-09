@@ -8,7 +8,7 @@ const packageFeatures = {
   starter_credits: [
     "Digital credits for AI real estate video generation",
     `Enough for multiple basic videos at ${VIDEO_GENERATION_CREDIT_COST} credits each`,
-    "Good for testing PropReel with live listings",
+    "Good for testing Viseo with live listings",
   ],
   growth_credits: [
     "Digital credits for active listing marketing",
@@ -23,14 +23,14 @@ const packageFeatures = {
 };
 
 export const metadata = {
-  title: "Pricing - PropReel",
-  description: "PropReel digital credit packages for AI real estate marketing videos.",
+  title: "Pricing - Viseo",
+  description: "Viseo digital credit packages for AI real estate marketing videos.",
 };
 
 export default function PricingPage() {
   const packages = getCreditPackagesWithPaymentLinks().map((pack) => ({
     ...pack,
-    features: packageFeatures[pack.id] || ["Digital credits for PropReel video generation"],
+    features: packageFeatures[pack.id] || ["Digital credits for Viseo video generation"],
   }));
 
   return (
@@ -51,7 +51,7 @@ export default function PricingPage() {
         <div className="pr-section mt-8 p-5">
           <p className="pr-kicker">Purchase notes</p>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--pr-muted)] md:grid-cols-2">
-            <p>- Credits are delivered digitally to your PropReel account after payment confirmation.</p>
+            <p>- Credits are delivered digitally to your Viseo account after payment confirmation.</p>
             <p>- Credits are delivered instantly after payment confirmation.</p>
             <p>- No subscription; one-time purchase.</p>
             <p>- Unused credits are refundable; see our Cancellation Policy.</p>

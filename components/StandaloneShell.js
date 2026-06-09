@@ -16,6 +16,7 @@ import {
   AgentStudio,
   AppsStudio,
 } from 'studio';
+import BrandLogo from '@/components/BrandLogo';
 
 const DesignAgentStudio = dynamic(() => import('studio').then((mod) => mod.DesignAgentStudio), {
   ssr: false,
@@ -187,12 +188,7 @@ export default function StandaloneShell() {
       {isHeaderVisible && (
         <header className="flex-shrink-0 h-14 border-b border-white/[0.03] flex items-center justify-between px-6 bg-black/20 backdrop-blur-md z-40 gap-4">
           <div className="flex-shrink-0 flex items-center gap-2">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="text-sm font-bold tracking-tight hidden sm:block">PropReel</span>
+            <BrandLogo size="sm" />
           </div>
 
           <div className="flex-1 min-w-0 mx-4 sm:mx-6 relative overflow-hidden h-full flex items-center justify-start lg:justify-center">

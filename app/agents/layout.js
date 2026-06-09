@@ -4,7 +4,7 @@
  * Legacy agent routes are disabled in the Fal.ai Part 1 setup.
  */
 export const metadata = {
-  title: "Agent Chat — Open Generative AI",
+  title: "Agent Chat - Viseo",
 };
 
 export default function AgentsLayout({ children }) {

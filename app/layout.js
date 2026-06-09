@@ -3,7 +3,7 @@ import Providers from "@/components/Providers";
 import SiteFooter from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "PropReel - Real Estate Video SaaS",
+  title: "Viseo - Real Estate Video SaaS",
   description: "Turn property listings into social-ready marketing videos with Fal.ai.",
 };
 

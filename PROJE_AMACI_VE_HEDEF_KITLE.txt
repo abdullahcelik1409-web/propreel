@@ -1,0 +1,50 @@
+Viseo Proje Amacı ve Hedef Kitle Metni
+
+Projenin Amacı
+
+Viseo, emlak ilanlarını daha etkili, hızlı ve profesyonel şekilde pazarlamak için geliştirilmiş bir yapay zeka destekli video üretim platformudur. Projenin temel amacı, gayrimenkul danışmanlarının ve emlak ofislerinin ellerindeki ilan fotoğraflarını, ilan bilgilerini ve satış vurgularını kullanarak sosyal medya ve dijital pazarlama için hazır tanıtım videolarına dönüştürmektir.
+
+Hangi Sorunu Çözer?
+
+Gayrimenkul sektöründe ilanların dikkat çekmesi giderek zorlaşıyor. Standart fotoğraf galerileri, özellikle sosyal medya kullanıcılarının hızlı tüketim alışkanlıkları içinde çoğu zaman yeterince etkili olmuyor. Profesyonel video üretimi ise zaman, bütçe, ekipman ve montaj bilgisi gerektiriyor.
+
+Viseo bu problemi şu noktalarda çözer:
+
+- Emlak danışmanlarının video prodüksiyon bilgisine ihtiyaç duymadan tanıtım videosu oluşturmasını sağlar.
+- İlan fotoğraflarını sosyal medya uyumlu video içeriklerine dönüştürür.
+- Video üretim sürecini manuel kurgu ve edit aşamalarından büyük ölçüde arındırır.
+- İlan başlığı, fiyat, konum, oda bilgileri ve öne çıkan özellikler gibi verileri video üretim sürecine dahil eder.
+- Kredi sistemiyle video üretim maliyetini kontrollü ve ölçülebilir hale getirir.
+- Admin paneliyle kullanıcı ve kredi yönetimini merkezi hale getirir.
+
+Nasıl Çözer?
+
+Viseo, kullanıcıdan ilan bilgilerini ve ilan fotoğraflarını alır. Kullanıcı video üretim ekranında video modu, süre, format, stil ve sahne yönlendirmesi gibi seçenekleri belirler. Sistem bu bilgileri İngilizce ve modele uygun prompt yapısına dönüştürerek Fal.ai video modellerine gönderir.
+
+Platformun temel işleyişi şu şekildedir:
+
+1. Kullanıcı ilan bilgilerini girer.
+2. Kullanıcı en az bir, en fazla dört fotoğraf seçerek video üretim akışına geçer.
+3. Sistem seçilen video tarzına ve sahne direktifine göre profesyonel prompt üretir.
+4. Fal.ai üzerinden video üretim işi başlatılır.
+5. Kredi sistemi üretim maliyetini kontrol eder ve yeterli kredi yoksa üretim başlatılmaz.
+6. Video işi bekleyen, tamamlanan veya başarısız durumlarıyla takip edilir.
+7. Tamamlanan videolar kullanıcının video kütüphanesinde görüntülenir ve indirilebilir.
+8. Admin paneli üzerinden kullanıcılar ve kredi bakiyeleri yönetilebilir.
+
+Kime Hitap Eder?
+
+Viseo özellikle şu kullanıcı gruplarına hitap eder:
+
+- Emlak danışmanları
+- Gayrimenkul ofisleri
+- Lüks konut ve villa portföyü yöneten satış ekipleri
+- Sosyal medyada daha güçlü ilan tanıtımı yapmak isteyen brokerlar
+- Kısa sürede çok sayıda ilan videosu üretmek isteyen ajanslar
+- Portföylerini Instagram, TikTok, YouTube Shorts ve benzeri kanallarda pazarlamak isteyen profesyoneller
+
+Projenin Değer Önerisi
+
+Viseo, emlak pazarlamasında video üretimini daha ulaşılabilir, hızlı ve ölçeklenebilir hale getirir. Kullanıcının teknik kurgu bilgisi, kamera ekibi veya pahalı prodüksiyon süreci olmadan ilanlarını daha dikkat çekici video içeriklerine dönüştürmesini sağlar.
+
+Bu sayede emlak profesyonelleri daha kısa sürede daha güçlü içerikler üretebilir, ilanlarının dijital görünürlüğünü artırabilir ve potansiyel müşterilere daha profesyonel bir ilk izlenim sunabilir.

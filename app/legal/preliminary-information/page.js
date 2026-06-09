@@ -3,7 +3,7 @@ import MarketingNav from "@/components/MarketingNav";
 import { legalDocuments } from "@/lib/legalDocuments";
 
 export const metadata = {
-  title: "Preliminary Information Form - PropReel",
+  title: "Preliminary Information Form - Viseo",
 };
 
 export default function PreliminaryInformationPage() {

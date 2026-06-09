@@ -3,7 +3,7 @@ import MarketingNav from "@/components/MarketingNav";
 import { legalDocuments } from "@/lib/legalDocuments";
 
 export const metadata = {
-  title: "Privacy Policy - PropReel",
+  title: "Privacy Policy - Viseo",
 };
 
 export default function PrivacyPolicyPage() {

@@ -7,7 +7,7 @@ const faqs = [
     "What is a credit?",
     "Each credit is a unit used to generate one video segment. Basic videos use 120 credits, multi-image videos use 160 credits (10s) or 480 credits (30s).",
   ],
-  ["Do credits expire?", "No. Credits are added to your PropReel account and never expire."],
+  ["Do credits expire?", "No. Credits are added to your Viseo account and never expire."],
   [
     "Can I get a refund on unused credits?",
     "Yes. Unused credits can be refunded within 14 days of purchase. See our Cancellation & Refund Policy for details.",
@@ -18,7 +18,7 @@ const faqs = [
   ],
   [
     "Is my payment information secure?",
-    "Yes. PropReel uses iyzico, a BDDK-licensed payment provider with PCI-DSS Level 1 certification. We never store your card details.",
+    "Yes. Viseo uses iyzico, a BDDK-licensed payment provider with PCI-DSS Level 1 certification. We never store your card details.",
   ],
 ];
 

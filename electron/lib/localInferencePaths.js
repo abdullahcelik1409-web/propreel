@@ -1,6 +1,6 @@
 const path = require('path');
 
-const LOCAL_AI_DIR_ENV = 'OPEN_GENERATIVE_AI_LOCAL_AI_DIR';
+const LOCAL_AI_DIR_ENV = 'VISEO_LOCAL_AI_DIR';
 
 function normalizeDirOverride(value) {
     return typeof value === 'string' ? value.trim() : '';

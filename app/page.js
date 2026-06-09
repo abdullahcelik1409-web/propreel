@@ -93,7 +93,7 @@ export default function LandingPage() {
             Property video production for working real estate agents
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--pr-muted)]">
-            PropReel turns listing photos, prices, location data, and property features into clean marketing videos for agencies that need repeatable output.
+            Viseo turns listing photos, prices, location data, and property features into clean marketing videos for agencies that need repeatable output.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/auth/register" className="pr-primary px-5 py-3 text-center">
