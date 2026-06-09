@@ -1,7 +1,8 @@
 import MarketingNav from "@/components/MarketingNav";
 import PricingFaq from "@/components/PricingFaq";
 import PricingPlans from "@/components/PricingPlans";
-import { CREDIT_PACKAGES, MULTI_IMAGE_VIDEO_CREDIT_COSTS, VIDEO_GENERATION_CREDIT_COST } from "@/lib/videoConfig";
+import { getCreditPackagesWithPaymentLinks } from "@/lib/paymentConfig";
+import { MULTI_IMAGE_VIDEO_CREDIT_COSTS, VIDEO_GENERATION_CREDIT_COST } from "@/lib/videoConfig";
 
 const packageFeatures = {
   starter_credits: [
@@ -27,7 +28,7 @@ export const metadata = {
 };
 
 export default function PricingPage() {
-  const packages = CREDIT_PACKAGES.map((pack) => ({
+  const packages = getCreditPackagesWithPaymentLinks().map((pack) => ({
     ...pack,
     features: packageFeatures[pack.id] || ["Digital credits for PropReel video generation"],
   }));
@@ -50,13 +51,13 @@ export default function PricingPage() {
         <div className="pr-section mt-8 p-5">
           <p className="pr-kicker">Purchase notes</p>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--pr-muted)] md:grid-cols-2">
-            <p>✓ Credits are delivered digitally to your PropReel account after payment confirmation.</p>
-            <p>✓ Credits are delivered instantly after payment confirmation.</p>
-            <p>✓ No subscription — one-time purchase.</p>
-            <p>✓ Unused credits are refundable — see our Cancellation Policy.</p>
-            <p>✓ Payments secured by iyzico (BDDK licensed).</p>
+            <p>- Credits are delivered digitally to your PropReel account after payment confirmation.</p>
+            <p>- Credits are delivered instantly after payment confirmation.</p>
+            <p>- No subscription; one-time purchase.</p>
+            <p>- Unused credits are refundable; see our Cancellation Policy.</p>
+            <p>- Payments secured by iyzico.</p>
             <p>
-              ✓ Basic videos use {VIDEO_GENERATION_CREDIT_COST} credits. Multi Image videos use {MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits for 10s or{" "}
+              - Basic videos use {VIDEO_GENERATION_CREDIT_COST} credits. Multi Image videos use {MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits for 10s or{" "}
               {MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits for 30s.
             </p>
           </div>

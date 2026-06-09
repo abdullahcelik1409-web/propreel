@@ -1,7 +1,8 @@
 import Link from "next/link";
 import MarketingNav from "@/components/MarketingNav";
 import PricingPlans from "@/components/PricingPlans";
-import { CREDIT_PACKAGES, PRODUCTION_DEFAULT_USER_CREDITS } from "@/lib/videoConfig";
+import { getCreditPackagesWithPaymentLinks } from "@/lib/paymentConfig";
+import { PRODUCTION_DEFAULT_USER_CREDITS } from "@/lib/videoConfig";
 
 const features = [
   {
@@ -26,13 +27,6 @@ const features = [
   },
 ];
 
-const socialProof = [
-  ["2,400+", "Videos Generated"],
-  ["180+", "Active Agents"],
-  ["~45 sec", "Avg. Generation Time"],
-  ["4 Platforms", "Instagram · TikTok · YouTube · LinkedIn"],
-];
-
 const packageFeatures = {
   starter_credits: ["Starter batch for new listings"],
   growth_credits: ["Most popular for active agents"],
@@ -41,6 +35,7 @@ const packageFeatures = {
 
 function FeatureIcon({ type }) {
   const className = "h-6 w-6";
+
   if (type === "clipboard") {
     return (
       <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
@@ -49,6 +44,7 @@ function FeatureIcon({ type }) {
       </svg>
     );
   }
+
   if (type === "sparkles") {
     return (
       <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
@@ -58,6 +54,7 @@ function FeatureIcon({ type }) {
       </svg>
     );
   }
+
   if (type === "share") {
     return (
       <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
@@ -67,6 +64,7 @@ function FeatureIcon({ type }) {
       </svg>
     );
   }
+
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
       <path d="M16 16L12 12L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -77,7 +75,7 @@ function FeatureIcon({ type }) {
 }
 
 export default function LandingPage() {
-  const packages = CREDIT_PACKAGES.map((pack) => ({
+  const packages = getCreditPackagesWithPaymentLinks().map((pack) => ({
     ...pack,
     features: packageFeatures[pack.id] || [pack.description],
   }));
@@ -89,7 +87,7 @@ export default function LandingPage() {
       <section className="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
         <div className="flex flex-col justify-center">
           <div className="mb-5 inline-flex w-fit rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-3 py-1 text-xs font-bold text-[var(--pr-cyan)]">
-            {PRODUCTION_DEFAULT_USER_CREDITS} free credits with every new account — no credit card required
+            {PRODUCTION_DEFAULT_USER_CREDITS} free credits with every new account - no credit card required
           </div>
           <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-tight md:text-6xl">
             Property video production for working real estate agents
@@ -102,7 +100,7 @@ export default function LandingPage() {
               Start free
             </Link>
             <Link href="#how-it-works" className="pr-secondary px-5 py-3 text-center font-semibold">
-              See how it works →
+              See how it works
             </Link>
           </div>
         </div>
@@ -115,7 +113,9 @@ export default function LandingPage() {
               </span>
               <div className="flex h-full items-center justify-center rounded-md border border-[var(--pr-border-soft)] bg-black/20">
                 <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[var(--pr-cyan)]/35 bg-[var(--pr-cyan-soft)] text-3xl text-[var(--pr-cyan)] shadow-[0_0_34px_rgba(0,251,251,0.12)]">
-                  ▶
+                  <svg viewBox="0 0 24 24" fill="none" className="h-9 w-9" aria-hidden="true">
+                    <path d="M8 5L19 12L8 19V5Z" fill="currentColor" />
+                  </svg>
                 </div>
               </div>
             </div>
@@ -144,15 +144,6 @@ export default function LandingPage() {
               </div>
               <h3 className="font-semibold">{feature.title}</h3>
               <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">{feature.body}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="pr-section mt-6 grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
-          {socialProof.map(([value, label]) => (
-            <div key={value} className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-4">
-              <p className="text-3xl font-black text-[var(--pr-cyan)]">{value}</p>
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-muted)]">{label}</p>
             </div>
           ))}
         </div>

@@ -6,6 +6,9 @@ export const metadata = {
   description: "Contact PropReel seller support for digital real estate video credits.",
 };
 
+const phoneHref = `tel:${SELLER_INFO.phone.replace(/\s/g, "")}`;
+const mailHref = `mailto:${SELLER_INFO.email}?subject=PropReel%20support`;
+
 export default function ContactPage() {
   return (
     <main className="pr-shell min-h-screen">
@@ -48,31 +51,27 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <form className="pr-section p-5" aria-label="Contact form">
-          <h2 className="text-xl font-black">Send a message</h2>
-          <p className="mt-2 text-sm text-[var(--pr-muted)]">This form is a contact UI. You can also email us directly for support.</p>
-          <div className="mt-6 grid gap-4">
-            <label className="grid gap-2 text-sm font-bold">
-              Name
-              <input className="pr-input px-3 py-3 font-normal" placeholder="Your name" />
-            </label>
-            <label className="grid gap-2 text-sm font-bold">
-              Email
-              <input type="email" className="pr-input px-3 py-3 font-normal" placeholder="you@example.com" />
-            </label>
-            <label className="grid gap-2 text-sm font-bold">
-              Subject
-              <input className="pr-input px-3 py-3 font-normal" placeholder="Credit package or account support" />
-            </label>
-            <label className="grid gap-2 text-sm font-bold">
-              Message
-              <textarea className="pr-input min-h-36 px-3 py-3 font-normal" placeholder="How can we help?" />
-            </label>
-            <button type="button" className="pr-primary px-5 py-3 text-sm">
-              Send Message
-            </button>
+        <div className="pr-section p-5">
+          <p className="pr-kicker">Support</p>
+          <h2 className="mt-2 text-2xl font-black">Use direct contact channels</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--pr-muted)]">
+            For the fastest response, contact the seller directly by email or phone. Include your account email, credit package, and a short description of the issue.
+          </p>
+
+          <div className="mt-6 grid gap-3">
+            <a href={mailHref} className="pr-primary inline-flex justify-center px-5 py-3 text-sm">
+              Email PropReel Support
+            </a>
+            <a href={phoneHref} className="pr-secondary inline-flex justify-center px-5 py-3 text-sm font-semibold">
+              Call Seller
+            </a>
           </div>
-        </form>
+
+          <div className="mt-6 rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-4 text-sm leading-7 text-[var(--pr-muted)]">
+            <p className="font-bold text-white">Support topics</p>
+            <p className="mt-2">Digital credit delivery, refund requests, failed video generation, account access, and iyzico payment link questions.</p>
+          </div>
+        </div>
       </section>
     </main>
   );

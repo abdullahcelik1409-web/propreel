@@ -44,7 +44,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-3 border-t border-[var(--pr-border-soft)] pt-6 md:flex-row md:items-center md:justify-between">
-        <p className="leading-6">© 2025 PropReel · {SELLER_INFO.footerLine}</p>
+        <p className="leading-6">© 2026 PropReel · {SELLER_INFO.footerLine}</p>
         <p className="rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-3 py-2 text-xs font-bold text-[var(--pr-cyan)]">
           {PAYMENT_NOTICE}
         </p>

@@ -51,6 +51,7 @@ export default function PricingPlans({ packages, action = "modal", compact = fal
       <div className="grid gap-4 md:grid-cols-3">
         {packages.map((pack) => {
           const popular = pack.id === "growth_credits";
+          const hasPaymentUrl = Boolean(pack.paymentUrl);
 
           return (
             <article
@@ -72,7 +73,7 @@ export default function PricingPlans({ packages, action = "modal", compact = fal
               <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">{pack.name}</p>
               <div className="mt-3 flex items-end gap-2">
                 <p className="text-5xl font-black tabular-nums text-white">${pack.priceUsd}</p>
-                <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">USD · one-time</p>
+                <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">USD / one-time</p>
               </div>
               <p className="mt-2 text-lg font-bold text-[var(--pr-muted)]">{pack.credits.toLocaleString("en-US")} credits</p>
               <p className="mt-3 min-h-12 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
@@ -90,12 +91,16 @@ export default function PricingPlans({ packages, action = "modal", compact = fal
                 <Link href="/pricing" className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
                   <LockIcon /> Buy Now
                 </Link>
+              ) : hasPaymentUrl ? (
+                <a href={pack.paymentUrl} target="_blank" rel="noopener noreferrer" className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
+                  <LockIcon /> Buy Now
+                </a>
               ) : (
                 <button type="button" onClick={() => setSelectedPackage(pack)} className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
                   <LockIcon /> Buy Now
                 </button>
               )}
-              <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">Secure · iyzico</p>
+              <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">Secure / iyzico</p>
             </article>
           );
         })}
@@ -107,10 +112,13 @@ export default function PricingPlans({ packages, action = "modal", compact = fal
             <p className="pr-kicker">Secure payment</p>
             <h2 className="mt-2 text-xl font-black">{selectedPackage.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">
-              You're being redirected to our secure iyzico payment page.
+              Secure iyzico payment links will be enabled after merchant approval. Until then, contact us for purchase and application questions.
             </p>
             <p className="mt-3 rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-3 text-sm font-semibold text-[var(--pr-cyan)]">
-              {selectedPackage.credits.toLocaleString("en-US")} credits · ${selectedPackage.priceUsd} USD
+              {selectedPackage.credits.toLocaleString("en-US")} credits / ${selectedPackage.priceUsd} USD
+            </p>
+            <p className="mt-3 text-xs leading-5 text-[var(--pr-dim)]">
+              After iyzico approves the account, this package will open the matching iyzico payment link directly.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button
