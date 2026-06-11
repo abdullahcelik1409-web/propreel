@@ -23,6 +23,7 @@ model User {
   listings      Listing[]
   videos        Video[]
   creditEvents  CreditEvent[]
+  paymentOrders PaymentOrder[]
 }
 
 model Listing {
@@ -97,6 +98,33 @@ model CreditEvent {
 
   @@index([userId, createdAt])
   @@index([referenceId])
+}
+
+model PaymentOrder {
+  id              String   @id @default(cuid())
+  provider        String   @default("shopier")
+  providerOrderId String   @unique
+  providerEventId String?
+  eventType       String?
+  status          String   @default("received")
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  packageId       String?
+  packageName     String?
+  credits         Int      @default(0)
+  amount          String?
+  currency        String?
+  buyerEmail      String?
+  buyerName       String?
+  creditedAt      DateTime?
+  rawPayload      Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([packageId])
+  @@index([provider, providerOrderId])
 }
 
 model Account {
