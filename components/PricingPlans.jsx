@@ -95,7 +95,7 @@ export default function PricingPlans({ packages, compact = false }) {
                   <LockIcon /> Buy Now
                 </button>
               )}
-              <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">Secure / iyzico</p>
+              <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">Secure / Shopier</p>
             </article>
           );
         })}
@@ -107,13 +107,13 @@ export default function PricingPlans({ packages, compact = false }) {
             <p className="pr-kicker">Secure payment</p>
             <h2 className="mt-2 text-xl font-black">{selectedPackage.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">
-              Secure iyzico payment links will be enabled after merchant approval. Until then, contact us for purchase and application questions.
+              Secure Shopier payment links will be enabled after account approval. Until then, contact us for purchase and application questions.
             </p>
             <p className="mt-3 rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-3 text-sm font-semibold text-[var(--pr-cyan)]">
               {selectedPackage.credits.toLocaleString("en-US")} credits / ${selectedPackage.priceUsd} USD
             </p>
             <p className="mt-3 text-xs leading-5 text-[var(--pr-dim)]">
-              After iyzico approves the account, this package will open the matching iyzico payment link directly.
+              After Shopier approves the account, this package will open the matching Shopier payment link directly.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button

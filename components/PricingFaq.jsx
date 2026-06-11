@@ -14,11 +14,11 @@ const faqs = [
   ],
   [
     "Which payment methods are accepted?",
-    "Payments are processed via iyzico. All major credit and debit cards are accepted, including Visa and Mastercard.",
+    "Payments are processed through Shopier payment links. All major credit and debit cards are accepted, including Visa and Mastercard.",
   ],
   [
     "Is my payment information secure?",
-    "Yes. Viseo uses iyzico, a BDDK-licensed payment provider with PCI-DSS Level 1 certification. We never store your card details.",
+    "Yes. Payments are handled through Shopier's secure checkout infrastructure. Viseo never stores your card details.",
   ],
 ];
 

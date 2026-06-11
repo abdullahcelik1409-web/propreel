@@ -41,7 +41,7 @@ export default function PricingPage() {
           <p className="pr-kicker">Pricing</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent USD credit packages</h1>
           <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
-            Buy digital credits and use them to generate real estate marketing videos. Payments will be completed through secure iyzico payment links.
+            Buy digital credits and use them to generate real estate marketing videos. Payments will be completed through secure Shopier payment links.
           </p>
         </div>
         <div className="mt-10">
@@ -52,10 +52,10 @@ export default function PricingPage() {
           <p className="pr-kicker">Purchase notes</p>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--pr-muted)] md:grid-cols-2">
             <p>- Credits are delivered digitally to your Viseo account after payment confirmation.</p>
-            <p>- Credits are delivered instantly after payment confirmation.</p>
+            <p>- Shopier payment links open externally when package links are configured.</p>
             <p>- No subscription; one-time purchase.</p>
             <p>- Unused credits are refundable; see our Cancellation Policy.</p>
-            <p>- Payments secured by iyzico.</p>
+            <p>- Payments secured by Shopier.</p>
             <p>
               - Basic videos use {VIDEO_GENERATION_CREDIT_COST} credits. Multi Image videos use {MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits for 10s or{" "}
               {MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits for 30s.
