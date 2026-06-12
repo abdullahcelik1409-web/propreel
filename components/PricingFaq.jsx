@@ -14,7 +14,7 @@ const faqs = [
   ],
   [
     "Which payment methods are accepted?",
-    "Payments are processed through Shopier payment links. All major credit and debit cards are accepted, including Visa and Mastercard.",
+    "Payments are processed in TRY through Shopier payment links. International card issuers may apply their own exchange rate and fees.",
   ],
   [
     "Is my payment information secure?",

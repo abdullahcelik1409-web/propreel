@@ -49,7 +49,7 @@ export default function PricingPage() {
       <section className="mx-auto max-w-7xl px-6 py-14">
         <div className="max-w-3xl">
           <p className="pr-kicker">Pricing</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent USD credit packages</h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent TRY credit packages</h1>
           <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
             Buy digital credits and use them to generate real estate marketing videos. Payments will be completed through secure Shopier payment links.
           </p>
@@ -63,6 +63,7 @@ export default function PricingPage() {
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--pr-muted)] md:grid-cols-2">
             <p>- Credits are delivered digitally to your Viseo account after payment confirmation.</p>
             <p>- Shopier payment links open externally when package links are configured.</p>
+            <p>- Payments are charged in TRY. International card issuers may apply their own exchange rate and fees.</p>
             <p>- No subscription; one-time purchase.</p>
             <p>- Unused credits are refundable; see our Cancellation Policy.</p>
             <p>- Payments secured by Shopier.</p>

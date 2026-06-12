@@ -51,6 +51,10 @@ function LockIcon() {
   );
 }
 
+function formatTry(amount) {
+  return `${Number(amount || 0).toLocaleString("tr-TR")} TL`;
+}
+
 export default function PricingPlans({ packages, compact = false }) {
   const [selectedPackage, setSelectedPackage] = useState(null);
 
@@ -99,8 +103,8 @@ export default function PricingPlans({ packages, compact = false }) {
               </div>
               <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">{pack.name}</p>
               <div className="mt-3 flex items-end gap-2">
-                <p className="text-5xl font-black tabular-nums text-white">${pack.priceUsd}</p>
-                <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">USD / one-time</p>
+                <p className="text-4xl font-black tabular-nums text-white">{formatTry(pack.priceTry)}</p>
+                <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">TRY / one-time</p>
               </div>
               <p className="mt-2 text-lg font-bold text-[var(--pr-muted)]">{pack.credits.toLocaleString("en-US")} credits</p>
               <p className="mt-3 min-h-12 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
@@ -138,7 +142,7 @@ export default function PricingPlans({ packages, compact = false }) {
               Secure Shopier payment links will be enabled after account approval. Until then, contact us for purchase and application questions.
             </p>
             <p className="mt-3 rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-3 text-sm font-semibold text-[var(--pr-cyan)]">
-              {selectedPackage.credits.toLocaleString("en-US")} credits / ${selectedPackage.priceUsd} USD
+              {selectedPackage.credits.toLocaleString("en-US")} credits / {formatTry(selectedPackage.priceTry)}
             </p>
             <p className="mt-3 text-xs leading-5 text-[var(--pr-dim)]">
               After Shopier approves the account, this package will open the matching Shopier payment link directly.
