@@ -2,7 +2,7 @@ import MarketingNav from "@/components/MarketingNav";
 import PricingFaq from "@/components/PricingFaq";
 import PricingPlans from "@/components/PricingPlans";
 import { getCreditPackagesWithPaymentLinks } from "@/lib/paymentConfig";
-import { MULTI_IMAGE_VIDEO_CREDIT_COSTS, VIDEO_GENERATION_CREDIT_COST } from "@/lib/videoConfig";
+import { MULTI_IMAGE_VIDEO_CREDIT_COSTS, VIDEO_GENERATION_CREDIT_COST, premiumVideoConfig } from "@/lib/videoConfig";
 
 const packageFeatures = {
   starter_credits: [
@@ -19,6 +19,16 @@ const packageFeatures = {
     "Digital credits for high-volume real estate teams",
     `Supports 30s multi-image videos at ${MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits`,
     "Best value for agencies managing many listings",
+  ],
+  pro_credits_25000: [
+    "25,000 credits for premium real estate video production",
+    `Up to ${25000 / premiumVideoConfig.creditCost} Ultra Cinematic videos at ${premiumVideoConfig.creditCost.toLocaleString("en-US")} credits each`,
+    "Ideal for luxury listings and weekly campaigns",
+  ],
+  premium_credits_50000: [
+    "50,000 credits for high-volume premium video production",
+    `Up to ${50000 / premiumVideoConfig.creditCost} Ultra Cinematic videos at ${premiumVideoConfig.creditCost.toLocaleString("en-US")} credits each`,
+    "Best for luxury portfolios, agencies, and flagship campaigns",
   ],
 };
 
@@ -60,6 +70,7 @@ export default function PricingPage() {
               - Basic videos use {VIDEO_GENERATION_CREDIT_COST} credits. Multi Image videos use {MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits for 10s or{" "}
               {MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits for 30s.
             </p>
+            <p>- Ultra Cinematic videos use {premiumVideoConfig.creditCost.toLocaleString("en-US")} credits per generation.</p>
           </div>
         </div>
       </section>

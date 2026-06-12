@@ -5,6 +5,15 @@ import { useState } from "react";
 function PlanIcon({ id }) {
   const className = "h-5 w-5";
 
+  if (id === "pro_credits_25000" || id === "premium_credits_50000") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+        <path d="M12 3L14.4 8.2L20 9L15.8 13L16.9 18.6L12 15.8L7.1 18.6L8.2 13L4 9L9.6 8.2L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M4 21H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
   if (id === "growth_credits") {
     return (
       <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
@@ -47,26 +56,45 @@ export default function PricingPlans({ packages, compact = false }) {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {packages.map((pack) => {
           const popular = pack.id === "growth_credits";
+          const premium = pack.id === "pro_credits_25000" || pack.id === "premium_credits_50000";
+          const flagship = pack.id === "premium_credits_50000";
           const hasPaymentUrl = Boolean(pack.paymentUrl);
+          const badge = pack.badge || (popular ? "Most Popular" : null);
 
           return (
             <article
               key={pack.id}
               className={`relative flex flex-col rounded-lg border p-5 transition hover:-translate-y-1 ${
-                popular
-                  ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)] shadow-[0_0_34px_rgba(0,251,251,0.10)]"
-                  : "border-[var(--pr-border-soft)] bg-[var(--pr-surface)]"
+                flagship
+                  ? "border-[var(--pr-gold)] bg-[#17160f] shadow-[0_0_34px_rgba(255,209,102,0.14)]"
+                  : premium
+                    ? "border-[var(--pr-gold)]/45 bg-[#111411] shadow-[0_0_28px_rgba(255,209,102,0.08)]"
+                    : popular
+                      ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)] shadow-[0_0_34px_rgba(0,251,251,0.10)]"
+                      : "border-[var(--pr-border-soft)] bg-[var(--pr-surface)]"
               }`}
             >
-              {popular && (
-                <span className="absolute right-4 top-4 rounded-md border border-[var(--pr-cyan)]/30 bg-[#071010] px-3 py-1 text-xs font-black text-[var(--pr-cyan)]">
-                  Most Popular
+              {badge && (
+                <span
+                  className={`absolute right-4 top-4 max-w-[calc(100%-2rem)] rounded-md border bg-[#071010] px-3 py-1 text-right text-[11px] font-black uppercase leading-4 ${
+                    premium
+                      ? "border-[var(--pr-gold)]/40 text-[var(--pr-gold)]"
+                      : "border-[var(--pr-cyan)]/30 text-[var(--pr-cyan)]"
+                  }`}
+                >
+                  {badge}
                 </span>
               )}
-              <div className="flex h-10 w-10 items-center justify-center rounded-md border border-[var(--pr-border-soft)] bg-[#071010] text-[var(--pr-cyan)]">
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-md border bg-[#071010] ${
+                  premium
+                    ? "border-[var(--pr-gold)]/40 text-[var(--pr-gold)]"
+                    : "border-[var(--pr-border-soft)] text-[var(--pr-cyan)]"
+                }`}
+              >
                 <PlanIcon id={pack.id} />
               </div>
               <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">{pack.name}</p>
