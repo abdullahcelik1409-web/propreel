@@ -153,19 +153,14 @@ export async function POST(request) {
         userPrompt,
         style: templateId,
       });
-      const audioOffOverlays = mergeAudioMetadataIntoOverlays({
+      const premiumOverlays = mergeAudioMetadataIntoOverlays({
         ...overlays,
         promptTemplateId: templateId,
         sceneTemplateId,
         premiumProviderMode: providerMode,
         continuityMode: premiumVideoConfig.continuityMode,
-      }, {
-        audio_track_id: null,
-        audio_status: "none",
-        final_video_without_audio_url: null,
-        final_video_with_audio_url: null,
-        audio_error_message: null,
-      });
+        klingNativeAudio: "off",
+      }, audioMetadata);
 
       reservedVideo = await prisma.$transaction(async (tx) => {
         if (useRealProvider) {
@@ -189,7 +184,7 @@ export async function POST(request) {
             negativePrompt: premiumNegativePrompt,
             creditsCharged: useRealProvider ? premiumVideoConfig.creditCost : 0,
             providerCostEstimate: null,
-            overlays: audioOffOverlays,
+            overlays: premiumOverlays,
             scenePlan,
             providerRequests: [],
             thumbnailUrl: selectedImageUrls[0],

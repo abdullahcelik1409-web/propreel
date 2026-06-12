@@ -84,6 +84,35 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
     : videoMode === VIDEO_MODE_MULTI_IMAGE
       ? "Multi-photo image-to-video"
       : "Single-photo image-to-video";
+  const modeCards = [
+    {
+      value: VIDEO_MODE_BASIC,
+      label: "Basic Video",
+      description: "Single-photo image-to-video flow.",
+      badge: "Everyday",
+      creditLabel: `${VIDEO_GENERATION_CREDIT_COST} credits`,
+      requirement: "Requires 1 photo",
+      muted: true,
+    },
+    {
+      value: VIDEO_MODE_MULTI_IMAGE,
+      label: "Multi Image Video",
+      description: "Use 1 to 4 listing photos for a richer property video.",
+      badge: "Richer Flow",
+      creditLabel: `${getMultiImageCreditCost(multiImageDuration)} credits`,
+      requirement: `Requires 1 to ${MULTI_IMAGE_MAX_IMAGES} photos`,
+      muted: true,
+    },
+    {
+      value: VIDEO_MODE_ULTRA_CINEMATIC,
+      label: premiumUiCopy.title,
+      description: premiumUiCopy.subtitle,
+      badge: premiumUiCopy.badge,
+      creditLabel: premiumUiCopy.creditLabel,
+      requirement: premiumUiCopy.requirements,
+      muted: false,
+    },
+  ];
 
   useEffect(() => {
     const normalizedSceneTemplateId = normalizeSceneTemplateIdForMode(sceneTemplateId, videoMode);
@@ -141,7 +170,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           selectedImageUrls: requiresPhotoSelection ? selectedImageUrls.slice(0, currentImageLimit) : [],
           templateId,
           sceneTemplateId,
-          audio_track_id: premiumSelected || audioTrackId === NO_AUDIO_TRACK_ID ? null : audioTrackId,
+          audio_track_id: audioTrackId === NO_AUDIO_TRACK_ID ? null : audioTrackId,
           generationAction: PREMIUM_GENERATE_ACTION,
           prompt,
           overlays,
@@ -218,57 +247,28 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             </span>
           </div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {[
-              [VIDEO_MODE_BASIC, "Basic Video", "Single-photo image-to-video flow."],
-              [VIDEO_MODE_MULTI_IMAGE, "Multi Image Video", "Use 1 to 4 listing photos for a richer property video."],
-              [VIDEO_MODE_ULTRA_CINEMATIC, premiumUiCopy.title, premiumUiCopy.subtitle],
-            ].map(([value, label, description]) => (
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            {modeCards.map(({ value, label, description, badge, creditLabel, requirement, muted }) => {
+              const selected = videoMode === value;
+              const premiumCard = value === VIDEO_MODE_ULTRA_CINEMATIC;
+              return (
               <button
                 key={value}
                 type="button"
                 onClick={() => chooseVideoMode(value)}
-                className={`rounded-lg border p-4 text-left transition ${videoMode === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
+                className={`rounded-lg border p-4 text-left transition ${selected ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : premiumCard ? "border-[var(--pr-gold)]/45 bg-[var(--pr-gold-soft)] hover:border-[var(--pr-gold)]/70" : "border-[var(--pr-border-soft)] bg-[#071010] opacity-80 hover:border-[rgba(0,251,251,0.25)] hover:opacity-100"}`}
               >
                 <span className="flex flex-wrap items-center gap-2 font-bold">
                   {label}
-                  {value === VIDEO_MODE_ULTRA_CINEMATIC && (
-                    <>
-                      <span className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-gold)]">{premiumUiCopy.badge}</span>
-                      <span className="rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-cyan)]">{premiumUiCopy.secondaryBadge}</span>
-                    </>
-                  )}
+                  <span className={`rounded-md border px-2 py-1 text-[10px] uppercase tracking-[0.12em] ${premiumCard ? "border-[var(--pr-gold)]/35 bg-[var(--pr-gold-soft)] text-[var(--pr-gold)]" : "border-[var(--pr-border-soft)] bg-[#071010] text-[var(--pr-muted)]"}`}>{badge}</span>
                 </span>
                 <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">{description}</span>
-                {value === VIDEO_MODE_ULTRA_CINEMATIC && (
-                  <span className="mt-3 block text-xs leading-5 text-[var(--pr-gold)]">
-                    {premiumUiCopy.creditLabel} · {premiumUiCopy.requirements} · {premiumUiCopy.audioLabel}
-                  </span>
-                )}
+                <span className={`mt-3 block text-xs leading-5 ${muted ? "text-[var(--pr-muted)]" : "font-semibold text-[var(--pr-gold)]"}`}>
+                  {creditLabel} - {requirement}
+                </span>
               </button>
-            ))}
-          </div>
-
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            <div className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-4">
-              <p className="font-bold">Standard</p>
-              <ul className="mt-3 space-y-2 text-sm text-[var(--pr-muted)]">
-                <li>Faster generation</li>
-                <li>Lower credit cost</li>
-                <li>Shorter videos</li>
-                <li>Good for everyday listings</li>
-              </ul>
-            </div>
-            <div className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-4">
-              <p className="font-bold text-[var(--pr-gold)]">Ultra Cinematic</p>
-              <ul className="mt-3 space-y-2 text-sm text-[var(--pr-muted)]">
-                <li>Highest visual quality</li>
-                <li>60-second cinematic output</li>
-                <li>Premium multi-scene continuity</li>
-                <li>Best for high-value listings</li>
-                <li>Designed for flagship property campaigns</li>
-              </ul>
-            </div>
+            );
+            })}
           </div>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
@@ -431,9 +431,13 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             <input value={overlays.agentName} onChange={(event) => setOverlays((prev) => ({ ...prev, agentName: event.target.value }))} placeholder="Agent name" className="pr-input mt-3 px-3 py-3" />
           )}
 
-          {!premiumSelected && (
           <div className="mt-6">
             <p className="mb-3 text-sm font-bold text-[var(--pr-muted)]">Background Music</p>
+            {premiumSelected && (
+              <p className="mb-3 rounded-md border border-[var(--pr-border-soft)] bg-[#071010] px-3 py-2 text-sm text-[var(--pr-muted)]">
+                Kling native audio stays off. The selected background music will be added after the video is generated.
+              </p>
+            )}
             <div className="grid gap-3 md:grid-cols-2">
               {availableAudioTracks.map((track) => {
                 const selected = audioTrackId === track.audio_id;
@@ -456,13 +460,6 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               })}
             </div>
           </div>
-          )}
-          {premiumSelected && (
-            <div className="mt-6 rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-4">
-              <p className="text-sm font-bold text-[var(--pr-muted)]">Audio</p>
-              <p className="mt-1 text-sm text-[var(--pr-muted)]">Audio is off for Ultra Cinematic generation.</p>
-            </div>
-          )}
 
           <div className="mt-6">
             <p className="mb-3 text-sm font-bold text-[var(--pr-muted)]">Additional prompt</p>
@@ -488,7 +485,8 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             ["Format", format],
             ["Style", selectedStyle?.name || templateId],
             ["Scene", premiumSelected ? "Premium scene planner" : selectedScene?.name || sceneTemplateId],
-            ["Audio", premiumSelected ? "Off" : selectedAudio?.label || "No music"],
+            ["Music", selectedAudio?.label || "No music"],
+            ...(premiumSelected ? [["Kling native audio", "Off"]] : []),
             ...(premiumSelected ? [["Continuity mode", "Enabled"]] : []),
           ].map(([label, value]) => (
             <div key={label} className="flex items-start justify-between gap-4 border-b border-[var(--pr-border-soft)] pb-3">
