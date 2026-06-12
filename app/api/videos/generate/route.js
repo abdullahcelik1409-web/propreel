@@ -13,7 +13,7 @@ import { createInitialAudioMetadata, mergeAudioMetadataIntoOverlays, normalizeAu
 import { getAudioTrackById } from "@/lib/audioTrackService";
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
-import { premiumProviderFactory, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
+import { premiumProviderFactory, submitPremiumSceneGeneration, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
 import {
   recordVideoGenerationDebit,
   refundVideoGenerationCredits,
@@ -220,13 +220,29 @@ export async function POST(request) {
       const bridgeFrameService = createPremiumBridgeFrameService({
         mode: useRealProvider ? "real" : "mock",
       });
-      const generation = await submitPremiumVideoGeneration({
-        provider,
-        bridgeFrameService,
-        scenePlan,
-        jobId: reservedVideo.id,
-        aspectRatio: format,
-      });
+      const generation = useRealProvider
+        ? {
+          model: premiumVideoConfig.modelId,
+          modelName: premiumVideoConfig.modelName,
+          providerRequests: [
+            await submitPremiumSceneGeneration({
+              provider,
+              bridgeFrameService,
+              scene: scenePlan.scenes[0],
+              jobId: reservedVideo.id,
+              aspectRatio: format,
+            }),
+          ],
+          primaryJobId: null,
+        }
+        : await submitPremiumVideoGeneration({
+          provider,
+          bridgeFrameService,
+          scenePlan,
+          jobId: reservedVideo.id,
+          aspectRatio: format,
+        });
+      generation.primaryJobId = generation.primaryJobId || generation.providerRequests[0]?.requestId || null;
 
       if (!useRealProvider) {
         const finalComposition = await composePremiumVideoClips({
