@@ -4,14 +4,13 @@ import { readFile } from "node:fs/promises";
 
 import { CREDIT_PACKAGES, premiumVideoConfig } from "../lib/videoConfig.js";
 
-test("existing credit packages remain unchanged", () => {
+test("existing credit package ids, prices, and credit amounts remain unchanged", () => {
   assert.deepEqual(
-    CREDIT_PACKAGES.slice(0, 3).map(({ id, name, credits, priceUsd, description }) => ({
+    CREDIT_PACKAGES.slice(0, 3).map(({ id, name, credits, priceUsd }) => ({
       id,
       name,
       credits,
       priceUsd,
-      description,
     })),
     [
       {
@@ -19,21 +18,18 @@ test("existing credit packages remain unchanged", () => {
         name: "Starter Credits",
         credits: 1200,
         priceUsd: 9,
-        description: "Good for testing and small real estate video batches",
       },
       {
         id: "growth_credits",
         name: "Growth Credits",
         credits: 3000,
         priceUsd: 19,
-        description: "Best for active real estate agents",
       },
       {
         id: "agency_credits",
         name: "Agency Credits",
         credits: 9000,
         priceUsd: 49,
-        description: "Best for agencies and high-volume listing videos",
       },
     ],
   );
@@ -49,6 +45,12 @@ test("new premium credit packages match Ultra Cinematic capacity", () => {
   assert.equal(premium?.priceUsd, 299);
   assert.equal(premium?.credits, 50000);
   assert.equal(premium.credits / premiumVideoConfig.creditCost, 20);
+});
+
+test("Most Popular badge is assigned to the higher Pro package only", () => {
+  assert.equal(CREDIT_PACKAGES.find((pack) => pack.id === "growth_credits")?.badge, undefined);
+  assert.equal(CREDIT_PACKAGES.find((pack) => pack.id === "pro_credits_25000")?.badge, "Most Popular");
+  assert.equal(CREDIT_PACKAGES.find((pack) => pack.id === "premium_credits_50000")?.badge, undefined);
 });
 
 test("new Shopier env keys follow the configured checkout and webhook mapping", async () => {

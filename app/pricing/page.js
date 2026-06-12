@@ -6,29 +6,29 @@ import { MULTI_IMAGE_VIDEO_CREDIT_COSTS, VIDEO_GENERATION_CREDIT_COST, premiumVi
 
 const packageFeatures = {
   starter_credits: [
-    "Digital credits for AI real estate video generation",
-    `Enough for multiple basic videos at ${VIDEO_GENERATION_CREDIT_COST} credits each`,
-    "Good for testing Viseo with live listings",
+    `Up to ${Math.floor(1200 / VIDEO_GENERATION_CREDIT_COST)} Basic videos at ${VIDEO_GENERATION_CREDIT_COST} credits each`,
+    `Up to ${Math.floor(1200 / MULTI_IMAGE_VIDEO_CREDIT_COSTS[10])} short Multi Image videos for richer listing tests`,
+    "A smart entry pack for validating your first property video workflow",
   ],
   growth_credits: [
-    "Digital credits for active listing marketing",
-    `Supports basic and multi-image videos from ${MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits`,
-    "Best fit for weekly property promotion workflows",
+    `Up to ${Math.floor(3000 / VIDEO_GENERATION_CREDIT_COST)} Basic videos for recurring listing promotion`,
+    `Up to ${Math.floor(3000 / MULTI_IMAGE_VIDEO_CREDIT_COSTS[30])} extended 30s Multi Image tours`,
+    `Enough credit headroom for up to ${Math.floor(3000 / premiumVideoConfig.creditCost)} Ultra Cinematic showcase`,
   ],
   agency_credits: [
-    "Digital credits for high-volume real estate teams",
-    `Supports 30s multi-image videos at ${MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits`,
-    "Best value for agencies managing many listings",
+    `Up to ${Math.floor(9000 / MULTI_IMAGE_VIDEO_CREDIT_COSTS[30])} extended 30s Multi Image property tours`,
+    `Up to ${Math.floor(9000 / premiumVideoConfig.creditCost)} Ultra Cinematic premium showcases`,
+    "A balanced pack for teams mixing everyday listings with selected luxury campaigns",
   ],
   pro_credits_25000: [
-    "25,000 credits for premium real estate video production",
-    `Up to ${25000 / premiumVideoConfig.creditCost} Ultra Cinematic videos at ${premiumVideoConfig.creditCost.toLocaleString("en-US")} credits each`,
-    "Ideal for luxury listings and weekly campaigns",
+    `Up to ${Math.floor(25000 / premiumVideoConfig.creditCost)} Ultra Cinematic videos at ${premiumVideoConfig.creditCost.toLocaleString("en-US")} credits each`,
+    `Up to ${Math.floor(25000 / MULTI_IMAGE_VIDEO_CREDIT_COSTS[30])} extended 30s Multi Image tours for campaign variety`,
+    "Built for agents running premium listing launches week after week",
   ],
   premium_credits_50000: [
-    "50,000 credits for high-volume premium video production",
-    `Up to ${50000 / premiumVideoConfig.creditCost} Ultra Cinematic videos at ${premiumVideoConfig.creditCost.toLocaleString("en-US")} credits each`,
-    "Best for luxury portfolios, agencies, and flagship campaigns",
+    `Up to ${Math.floor(50000 / premiumVideoConfig.creditCost)} Ultra Cinematic videos for flagship property campaigns`,
+    `Up to ${Math.floor(50000 / MULTI_IMAGE_VIDEO_CREDIT_COSTS[30])} extended 30s Multi Image tours for high-volume marketing`,
+    "Designed for luxury portfolios, agency teams, and always-on premium production",
   ],
 };
 

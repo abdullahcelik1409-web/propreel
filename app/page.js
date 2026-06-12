@@ -28,11 +28,11 @@ const features = [
 ];
 
 const packageFeatures = {
-  starter_credits: ["Starter batch for new listings"],
-  growth_credits: ["Most popular for active agents"],
-  agency_credits: ["Best value for teams and agencies"],
-  pro_credits_25000: ["Up to 10 Ultra Cinematic videos"],
-  premium_credits_50000: ["Up to 20 Ultra Cinematic videos"],
+  starter_credits: ["Launch your first property video tests"],
+  growth_credits: ["Scale routine listing promotion"],
+  agency_credits: ["Blend multi-image tours with premium showcases"],
+  pro_credits_25000: ["Up to 10 Ultra Cinematic campaigns"],
+  premium_credits_50000: ["Up to 20 flagship premium campaigns"],
 };
 
 function FeatureIcon({ type }) {

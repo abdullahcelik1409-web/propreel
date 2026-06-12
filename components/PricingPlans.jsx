@@ -58,11 +58,11 @@ export default function PricingPlans({ packages, compact = false }) {
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {packages.map((pack) => {
-          const popular = pack.id === "growth_credits";
           const premium = pack.id === "pro_credits_25000" || pack.id === "premium_credits_50000";
           const flagship = pack.id === "premium_credits_50000";
           const hasPaymentUrl = Boolean(pack.paymentUrl);
-          const badge = pack.badge || (popular ? "Most Popular" : null);
+          const highlighted = pack.badge === "Most Popular";
+          const badge = pack.badge || null;
 
           return (
             <article
@@ -72,7 +72,7 @@ export default function PricingPlans({ packages, compact = false }) {
                   ? "border-[var(--pr-gold)] bg-[#17160f] shadow-[0_0_34px_rgba(255,209,102,0.14)]"
                   : premium
                     ? "border-[var(--pr-gold)]/45 bg-[#111411] shadow-[0_0_28px_rgba(255,209,102,0.08)]"
-                    : popular
+                    : highlighted
                       ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)] shadow-[0_0_34px_rgba(0,251,251,0.10)]"
                       : "border-[var(--pr-border-soft)] bg-[var(--pr-surface)]"
               }`}
