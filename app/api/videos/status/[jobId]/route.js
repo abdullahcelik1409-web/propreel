@@ -2,8 +2,6 @@ import { fail, ok } from "@/lib/api";
 import { checkJobStatus, getResult, getVideoUrlFromResult } from "@/lib/falVideoService";
 import { mergeProviderVideoClips } from "@/lib/videoMergeService";
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
-import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
-import { premiumProviderFactory, submitPremiumSceneGeneration } from "@/lib/premiumVideoProvider";
 import { addBackgroundAudioToFinalVideo } from "@/lib/videoAudioService";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -115,114 +113,9 @@ export async function GET(_request, { params }) {
       }
 
       const allCompleted = checkedRequests.every((request) => request.status === "completed" && request.videoUrl);
-      const plannedScenes = Array.isArray(video.scenePlan?.scenes) ? video.scenePlan.scenes : [];
-      const allPremiumScenesSubmitted = plannedScenes.length > 0 && checkedRequests.length >= plannedScenes.length;
       let updated = video;
 
-      if (allCompleted && !allPremiumScenesSubmitted) {
-        const claim = await prisma.video.updateMany({
-          where: {
-            id: video.id,
-            status: { not: "extracting_bridge_frames" },
-          },
-          data: {
-            status: "extracting_bridge_frames",
-            providerRequests: checkedRequests,
-            rawProviderResponse: { providerRequests: checkedRequests },
-          },
-        });
-
-        if (claim.count === 0) {
-          return ok({
-            success: true,
-            status: "extracting_bridge_frames",
-            video: {
-              ...video,
-              status: "extracting_bridge_frames",
-              providerRequests: checkedRequests,
-            },
-            providerRequests: checkedRequests,
-            refundedCredits: 0,
-          });
-        }
-
-        const bridgeFrameService = createPremiumBridgeFrameService({ mode: "real" });
-        const provider = premiumProviderFactory({ mode: "real" });
-        const previousRequest = checkedRequests[checkedRequests.length - 1];
-        const nextScene = plannedScenes[checkedRequests.length];
-        let bridgeFrameRef = null;
-
-        try {
-          try {
-            bridgeFrameRef = await bridgeFrameService.extractLastFrame(previousRequest, {
-              jobId: video.id,
-              sceneIndex: previousRequest.sceneIndex,
-              fallbackUrl: nextScene.sourcePhotoUrl,
-            });
-            bridgeFrameRef = await bridgeFrameService.persistBridgeFrameRef(video.id, previousRequest.sceneIndex, bridgeFrameRef);
-          } catch (bridgeError) {
-            bridgeFrameRef = await bridgeFrameService.persistBridgeFrameRef(video.id, previousRequest.sceneIndex, {
-              provider: "fallback",
-              frameUrl: nextScene.sourcePhotoUrl,
-              storagePath: null,
-              metadata: {
-                fallbackUsed: true,
-                error: getSafeErrorMessage(bridgeError, "Bridge frame extraction failed"),
-              },
-            });
-          }
-
-          const completedRequests = checkedRequests.map((request, index) => (
-            index === checkedRequests.length - 1
-              ? { ...request, bridgeFrameRef }
-              : request
-          ));
-          const nextRequest = await submitPremiumSceneGeneration({
-            provider,
-            bridgeFrameService,
-            scene: nextScene,
-            jobId: video.id,
-            aspectRatio: video.format,
-            previousBridgeFrame: bridgeFrameRef,
-          });
-
-          updated = await prisma.video.update({
-            where: { id: video.id },
-            data: {
-              status: "pending",
-              providerRequests: [...completedRequests, nextRequest],
-              rawProviderResponse: {
-                providerRequests: [...completedRequests, nextRequest],
-                bridgeFrameRef,
-                nextSceneIndex: nextScene.sceneIndex,
-              },
-            },
-          });
-
-          return ok({
-            success: true,
-            status: updated.status,
-            video: updated,
-            providerRequests: updated.providerRequests,
-            bridgeFrameRef,
-            refundedCredits: 0,
-          });
-        } catch (nextSceneError) {
-          updated = await refundVideoGenerationCredits({
-            userId: user.id,
-            videoId: video.id,
-            creditCost: video.creditsCharged || premiumVideoConfig.creditCost,
-            model: video.model || premiumVideoConfig.modelId,
-            durationSeconds: video.duration,
-            videoMode: video.videoMode,
-            errorMessage: nextSceneError?.message || "Ultra Cinematic bridge-frame scene submission failed",
-            rawProviderResponse: {
-              providerRequests: checkedRequests,
-              nextSceneError: nextSceneError?.message,
-            },
-          });
-        }
-      } else if (allCompleted) {
+      if (allCompleted) {
         try {
           const composition = await composePremiumVideoClips({
             jobId: video.id,
