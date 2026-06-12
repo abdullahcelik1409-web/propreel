@@ -1,6 +1,6 @@
 import { fail, ok } from "@/lib/api";
 import { checkJobStatus, getResult, getVideoUrlFromResult } from "@/lib/falVideoService";
-import { mergeProviderVideoClips } from "@/lib/videoMergeService";
+import { mergeProviderVideoClipsWithXfadeFallback } from "@/lib/videoMergeService";
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { addBackgroundAudioToFinalVideo } from "@/lib/videoAudioService";
 import { prisma } from "@/lib/prisma";
@@ -257,12 +257,14 @@ export async function GET(_request, { params }) {
       if (allCompleted) {
         try {
           const clipUrls = checkedRequests.map((request) => request.videoUrl);
-          const silentFinalVideoUrl = clipUrls.length > 1
-            ? await mergeProviderVideoClips(clipUrls, { videoId: video.id })
-            : clipUrls[0];
+          const mergeResult = await mergeProviderVideoClipsWithXfadeFallback(clipUrls, {
+            videoId: video.id,
+            targetDurationSeconds: video.duration || 30,
+            filePrefix: "multi-image",
+          });
           const audioResult = await addBackgroundAudioToFinalVideo({
             video,
-            silentVideoUrl: silentFinalVideoUrl,
+            silentVideoUrl: mergeResult.finalVideoUrl,
           });
 
           updated = await prisma.video.update({
@@ -275,7 +277,8 @@ export async function GET(_request, { params }) {
               rawProviderResponse: {
                 providerRequests: checkedRequests,
                 finalVideoUrl: audioResult.finalVideoUrl,
-                silentFinalVideoUrl,
+                silentFinalVideoUrl: mergeResult.finalVideoUrl,
+                merge: mergeResult,
                 audioFailed: audioResult.audioFailed,
               },
             },
