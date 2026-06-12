@@ -9,9 +9,15 @@ import {
   getDefaultSceneTemplateId,
   getMultiImageCreditCost,
   getSceneTemplatesForMode,
+  PREMIUM_GENERATE_ACTION,
   MULTI_IMAGE_DURATION_OPTIONS,
   MULTI_IMAGE_MAX_IMAGES,
+  VIDEO_MODE_ULTRA_CINEMATIC,
+  getPremiumDurationPlan,
+  isPremiumVideoMode,
   normalizeSceneTemplateIdForMode,
+  premiumUiCopy,
+  premiumVideoConfig,
   VIDEO_MODE_BASIC,
   VIDEO_MODE_MULTI_IMAGE,
   VIDEO_STYLE_TEMPLATES,
@@ -48,19 +54,36 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   const [overlays, setOverlays] = useState({ showPrice: true, showLocation: true, showBeds: true, showAgent: false, agentName: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const creditCost = videoMode === VIDEO_MODE_MULTI_IMAGE ? getMultiImageCreditCost(multiImageDuration) : VIDEO_GENERATION_CREDIT_COST;
+  const premiumSelected = isPremiumVideoMode(videoMode);
+  const currentImageLimit = premiumSelected ? Math.max(...premiumVideoConfig.allowedPhotoCounts) : MULTI_IMAGE_MAX_IMAGES;
+  const creditCost = premiumSelected
+    ? premiumVideoConfig.creditCost
+    : videoMode === VIDEO_MODE_MULTI_IMAGE
+      ? getMultiImageCreditCost(multiImageDuration)
+      : VIDEO_GENERATION_CREDIT_COST;
   const hasEnoughCredits = userCredits >= creditCost;
-  const effectiveSelectedImages = selectedImageUrls.slice(0, MULTI_IMAGE_MAX_IMAGES);
-  const requiresPhotoSelection = videoMode === VIDEO_MODE_MULTI_IMAGE;
-  const hasValidPhotoSelection = !requiresPhotoSelection || (selectedImageUrls.length >= 1 && selectedImageUrls.length <= MULTI_IMAGE_MAX_IMAGES);
+  const effectiveSelectedImages = selectedImageUrls.slice(0, currentImageLimit);
+  const requiresPhotoSelection = videoMode === VIDEO_MODE_MULTI_IMAGE || premiumSelected;
+  const premiumPhotoCountValid = premiumSelected && premiumVideoConfig.allowedPhotoCounts.includes(selectedImageUrls.length);
+  const hasValidPhotoSelection = !requiresPhotoSelection ||
+    (premiumSelected ? premiumPhotoCountValid : selectedImageUrls.length >= 1 && selectedImageUrls.length <= MULTI_IMAGE_MAX_IMAGES);
+  const premiumDurationPlan = premiumSelected ? getPremiumDurationPlan(selectedImageUrls.length) : null;
   const availableSceneTemplates = useMemo(() => getSceneTemplatesForMode(videoMode), [videoMode]);
   const disabledSceneTemplates = useMemo(() => (videoMode === VIDEO_MODE_MULTI_IMAGE ? BASIC_VIDEO_SCENE_TEMPLATES.filter((template) => template.id === "single_photo_hero") : []), [videoMode]);
   const selectedStyle = VIDEO_STYLE_TEMPLATES.find((template) => template.id === templateId);
   const selectedScene = availableSceneTemplates.find((template) => template.id === sceneTemplateId);
   const selectedAudio = availableAudioTracks.find((track) => track.audio_id === audioTrackId);
   const canGenerate = !loading && hasEnoughCredits && !!listing.photos?.length && hasValidPhotoSelection;
-  const generationDuration = videoMode === VIDEO_MODE_MULTI_IMAGE ? multiImageDuration : VIDEO_GENERATION_DURATION_SECONDS;
-  const generationEngine = videoMode === VIDEO_MODE_MULTI_IMAGE ? "Multi-photo image-to-video" : "Single-photo image-to-video";
+  const generationDuration = premiumSelected
+    ? `~${premiumVideoConfig.targetDurationSeconds}`
+    : videoMode === VIDEO_MODE_MULTI_IMAGE
+      ? multiImageDuration
+      : VIDEO_GENERATION_DURATION_SECONDS;
+  const generationEngine = premiumSelected
+    ? "Kling 3 Pro premium image-to-video"
+    : videoMode === VIDEO_MODE_MULTI_IMAGE
+      ? "Multi-photo image-to-video"
+      : "Single-photo image-to-video";
 
   useEffect(() => {
     const normalizedSceneTemplateId = normalizeSceneTemplateIdForMode(sceneTemplateId, videoMode);
@@ -70,6 +93,12 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   }, [sceneTemplateId, videoMode]);
 
   const toggle = (key) => setOverlays((prev) => ({ ...prev, [key]: !prev[key] }));
+  const chooseVideoMode = (nextVideoMode) => {
+    setVideoMode(nextVideoMode);
+    if (nextVideoMode === VIDEO_MODE_MULTI_IMAGE) {
+      setSelectedImageUrls((prev) => prev.slice(0, MULTI_IMAGE_MAX_IMAGES));
+    }
+  };
   const chooseTemplate = (nextTemplateId) => {
     setTemplateId(nextTemplateId);
     if (!audioTouched) {
@@ -83,14 +112,18 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   const toggleImage = (photo) => {
     setSelectedImageUrls((prev) => {
       if (prev.includes(photo)) return prev.filter((item) => item !== photo);
-      if (prev.length >= MULTI_IMAGE_MAX_IMAGES) return prev;
+      if (prev.length >= currentImageLimit) return prev;
       return [...prev, photo];
     });
   };
 
   const generate = async () => {
     setError("");
-    if (requiresPhotoSelection && selectedImageUrls.length < 1) {
+    if (premiumSelected && !premiumPhotoCountValid) {
+      setError(premiumUiCopy.photoValidation);
+      return;
+    }
+    if (!premiumSelected && requiresPhotoSelection && selectedImageUrls.length < 1) {
       setError(`Select at least 1 and up to ${MULTI_IMAGE_MAX_IMAGES} photos before generating a Multi Image video.`);
       return;
     }
@@ -104,11 +137,12 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           listingId: listing.id,
           videoMode,
           format,
-          duration: videoMode === VIDEO_MODE_MULTI_IMAGE ? multiImageDuration : VIDEO_GENERATION_DURATION_SECONDS,
-          selectedImageUrls: videoMode === VIDEO_MODE_MULTI_IMAGE ? selectedImageUrls.slice(0, MULTI_IMAGE_MAX_IMAGES) : [],
+          duration: videoMode === VIDEO_MODE_MULTI_IMAGE ? multiImageDuration : premiumSelected ? premiumVideoConfig.targetDurationSeconds : VIDEO_GENERATION_DURATION_SECONDS,
+          selectedImageUrls: requiresPhotoSelection ? selectedImageUrls.slice(0, currentImageLimit) : [],
           templateId,
           sceneTemplateId,
-          audio_track_id: audioTrackId === NO_AUDIO_TRACK_ID ? null : audioTrackId,
+          audio_track_id: premiumSelected || audioTrackId === NO_AUDIO_TRACK_ID ? null : audioTrackId,
+          generationAction: PREMIUM_GENERATE_ACTION,
           prompt,
           overlays,
         }),
@@ -188,17 +222,53 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             {[
               [VIDEO_MODE_BASIC, "Basic Video", "Single-photo image-to-video flow."],
               [VIDEO_MODE_MULTI_IMAGE, "Multi Image Video", "Use 1 to 4 listing photos for a richer property video."],
+              [VIDEO_MODE_ULTRA_CINEMATIC, premiumUiCopy.title, premiumUiCopy.subtitle],
             ].map(([value, label, description]) => (
               <button
                 key={value}
                 type="button"
-                onClick={() => setVideoMode(value)}
+                onClick={() => chooseVideoMode(value)}
                 className={`rounded-lg border p-4 text-left transition ${videoMode === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
               >
-                <span className="block font-bold">{label}</span>
+                <span className="flex flex-wrap items-center gap-2 font-bold">
+                  {label}
+                  {value === VIDEO_MODE_ULTRA_CINEMATIC && (
+                    <>
+                      <span className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-gold)]">{premiumUiCopy.badge}</span>
+                      <span className="rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-cyan)]">{premiumUiCopy.secondaryBadge}</span>
+                    </>
+                  )}
+                </span>
                 <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">{description}</span>
+                {value === VIDEO_MODE_ULTRA_CINEMATIC && (
+                  <span className="mt-3 block text-xs leading-5 text-[var(--pr-gold)]">
+                    {premiumUiCopy.creditLabel} · {premiumUiCopy.requirements} · {premiumUiCopy.audioLabel}
+                  </span>
+                )}
               </button>
             ))}
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-4">
+              <p className="font-bold">Standard</p>
+              <ul className="mt-3 space-y-2 text-sm text-[var(--pr-muted)]">
+                <li>Faster generation</li>
+                <li>Lower credit cost</li>
+                <li>Shorter videos</li>
+                <li>Good for everyday listings</li>
+              </ul>
+            </div>
+            <div className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-4">
+              <p className="font-bold text-[var(--pr-gold)]">Ultra Cinematic</p>
+              <ul className="mt-3 space-y-2 text-sm text-[var(--pr-muted)]">
+                <li>Highest visual quality</li>
+                <li>60-second cinematic output</li>
+                <li>Premium multi-scene continuity</li>
+                <li>Best for high-value listings</li>
+                <li>Designed for flagship property campaigns</li>
+              </ul>
+            </div>
           </div>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
@@ -239,16 +309,27 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             )}
           </div>
 
-          {videoMode === VIDEO_MODE_MULTI_IMAGE && (
+          {requiresPhotoSelection && (
             <div className="mt-6">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-bold text-[var(--pr-muted)]">Multi Image photos</p>
-                  <p className="mt-1 text-sm text-[var(--pr-muted)]">Select at least 1 and up to {MULTI_IMAGE_MAX_IMAGES} listing photos.</p>
+                  <p className="text-sm font-bold text-[var(--pr-muted)]">{premiumSelected ? "Ultra Cinematic photos" : "Multi Image photos"}</p>
+                  <p className="mt-1 text-sm text-[var(--pr-muted)]">
+                    {premiumSelected ? premiumUiCopy.photoValidation : `Select at least 1 and up to ${MULTI_IMAGE_MAX_IMAGES} listing photos.`}
+                  </p>
                 </div>
-                <p className="rounded-md border border-[var(--pr-border-soft)] px-3 py-1.5 text-xs font-bold text-[var(--pr-muted)]">{effectiveSelectedImages.length}/{MULTI_IMAGE_MAX_IMAGES} will be used</p>
+                <p className="rounded-md border border-[var(--pr-border-soft)] px-3 py-1.5 text-xs font-bold text-[var(--pr-muted)]">
+                  {premiumSelected ? `${effectiveSelectedImages.length}/8 or 10 selected` : `${effectiveSelectedImages.length}/${MULTI_IMAGE_MAX_IMAGES} will be used`}
+                </p>
               </div>
-              {selectedImageUrls.length < 1 && (
+              {premiumSelected && (
+                <div className={`mb-3 rounded-md border px-3 py-2 text-sm ${premiumPhotoCountValid ? "border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] text-[var(--pr-cyan)]" : "border-amber-500/25 bg-amber-500/10 text-amber-100"}`}>
+                  <p>{premiumUiCopy.formatDescription}</p>
+                  <p className="mt-1">{premiumUiCopy.creditRequirement}</p>
+                  {premiumDurationPlan?.valid && <p className="mt-1">Scene durations: {premiumDurationPlan.durations.join("s, ")}s.</p>}
+                </div>
+              )}
+              {!premiumSelected && selectedImageUrls.length < 1 && (
                 <p className="mb-3 rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
                   Select at least 1 photo to continue with Multi Image Video.
                 </p>
@@ -256,7 +337,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
                 {(listing.photos || []).map((photo, index) => {
                   const selected = selectedImageUrls.includes(photo);
-                  const disabled = !selected && selectedImageUrls.length >= MULTI_IMAGE_MAX_IMAGES;
+                  const disabled = !selected && selectedImageUrls.length >= currentImageLimit;
                   return (
                     <button
                       key={photo}
@@ -294,6 +375,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             ))}
           </div>
 
+          {!premiumSelected && (
           <div className="mt-6">
             <p className="mb-3 text-sm font-bold text-[var(--pr-muted)]">Scene direction</p>
             <div className="grid gap-3 md:grid-cols-2">
@@ -323,6 +405,15 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               ))}
             </div>
           </div>
+          )}
+          {premiumSelected && (
+            <div className="mt-6 rounded-md border border-[var(--pr-gold)]/25 bg-[var(--pr-gold-soft)] p-4">
+              <p className="text-sm font-bold text-[var(--pr-gold)]">Premium multi-scene continuity</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--pr-muted)]">
+                Create a smoother, more cinematic property walkthrough with bridge-frame planning, premium scene directives, and architecture-safe prompts.
+              </p>
+            </div>
+          )}
         </section>
 
         <section className="pr-section p-5">
@@ -340,6 +431,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             <input value={overlays.agentName} onChange={(event) => setOverlays((prev) => ({ ...prev, agentName: event.target.value }))} placeholder="Agent name" className="pr-input mt-3 px-3 py-3" />
           )}
 
+          {!premiumSelected && (
           <div className="mt-6">
             <p className="mb-3 text-sm font-bold text-[var(--pr-muted)]">Background Music</p>
             <div className="grid gap-3 md:grid-cols-2">
@@ -364,6 +456,13 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               })}
             </div>
           </div>
+          )}
+          {premiumSelected && (
+            <div className="mt-6 rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-4">
+              <p className="text-sm font-bold text-[var(--pr-muted)]">Audio</p>
+              <p className="mt-1 text-sm text-[var(--pr-muted)]">Audio is off for Ultra Cinematic generation.</p>
+            </div>
+          )}
 
           <div className="mt-6">
             <p className="mb-3 text-sm font-bold text-[var(--pr-muted)]">Additional prompt</p>
@@ -384,22 +483,23 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
         <div className="mt-5 space-y-3 text-sm">
           {[
             ["Engine", generationEngine],
-            ["Mode", videoMode === VIDEO_MODE_MULTI_IMAGE ? "Multi Image" : "Basic"],
-            ["Duration", `${generationDuration}s`],
+            ["Selected model", premiumSelected ? premiumUiCopy.title : videoMode === VIDEO_MODE_MULTI_IMAGE ? "Multi Image" : "Basic"],
+            ["Duration", premiumSelected ? `${generationDuration} seconds` : `${generationDuration}s`],
             ["Format", format],
             ["Style", selectedStyle?.name || templateId],
-            ["Scene", selectedScene?.name || sceneTemplateId],
-            ["Music", selectedAudio?.label || "No music"],
+            ["Scene", premiumSelected ? "Premium scene planner" : selectedScene?.name || sceneTemplateId],
+            ["Audio", premiumSelected ? "Off" : selectedAudio?.label || "No music"],
+            ...(premiumSelected ? [["Continuity mode", "Enabled"]] : []),
           ].map(([label, value]) => (
             <div key={label} className="flex items-start justify-between gap-4 border-b border-[var(--pr-border-soft)] pb-3">
               <span className="text-[var(--pr-muted)]">{label}</span>
               <span className="max-w-[190px] text-right font-semibold">{value}</span>
             </div>
           ))}
-          {videoMode === VIDEO_MODE_MULTI_IMAGE && (
+          {requiresPhotoSelection && (
             <div className="flex items-start justify-between gap-4 border-b border-[var(--pr-border-soft)] pb-3">
               <span className="text-[var(--pr-muted)]">Photos</span>
-              <span className="font-semibold">{effectiveSelectedImages.length}/{MULTI_IMAGE_MAX_IMAGES}</span>
+              <span className="font-semibold">{premiumSelected ? `${effectiveSelectedImages.length} selected` : `${effectiveSelectedImages.length}/${MULTI_IMAGE_MAX_IMAGES}`}</span>
             </div>
           )}
           <div className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-3">
@@ -414,7 +514,12 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
         )}
         {!hasEnoughCredits && (
           <p className="mt-4 rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
-            You need {creditCost} credits to generate this video.
+            {premiumSelected ? premiumUiCopy.insufficientCredits : `You need ${creditCost} credits to generate this video.`}
+          </p>
+        )}
+        {premiumSelected && !premiumPhotoCountValid && (
+          <p className="mt-4 rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+            {premiumUiCopy.photoValidation}
           </p>
         )}
         {error && <p className="mt-4 rounded-md border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-100">{error}</p>}

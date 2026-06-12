@@ -11,6 +11,9 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { createInitialAudioMetadata, mergeAudioMetadataIntoOverlays, normalizeAudioTrackId } from "@/lib/audioConfig";
 import { getAudioTrackById } from "@/lib/audioTrackService";
+import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
+import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
+import { premiumProviderFactory, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
 import {
   recordVideoGenerationDebit,
   refundVideoGenerationCredits,
@@ -22,13 +25,23 @@ import {
   DEFAULT_PROMPT_TEMPLATE_ID,
   FAL_MULTI_IMAGE_VIDEO_MODEL_ID,
   FAL_VIDEO_MODEL_ID,
+  PREMIUM_GENERATE_ACTION,
+  VIDEO_MODE_ULTRA_CINEMATIC,
+  buildPremiumScenePlan,
+  canUseRealPremiumProvider,
   getMultiImageCreditCost,
   getMultiImageProviderCostEstimate,
   getMultiImageScenePlan,
+  isPremiumVideoMode,
   MULTI_IMAGE_MAX_IMAGES,
   MULTI_IMAGE_NEGATIVE_PROMPT,
   normalizeAspectRatio,
   normalizeSceneTemplateIdForMode,
+  premiumNegativePrompt,
+  premiumVideoConfig,
+  resolvePremiumProviderMode,
+  validatePremiumCredits,
+  validatePremiumPhotoCount,
   VIDEO_MODE_BASIC,
   VIDEO_MODE_MULTI_IMAGE,
   VIDEO_GENERATION_CREDIT_COST,
@@ -42,7 +55,11 @@ export async function POST(request) {
     const user = await requireUser();
     const body = await request.json();
     const listingId = body.listingId;
-    const videoMode = body.videoMode === VIDEO_MODE_MULTI_IMAGE ? VIDEO_MODE_MULTI_IMAGE : VIDEO_MODE_BASIC;
+    const videoMode = body.videoMode === VIDEO_MODE_ULTRA_CINEMATIC
+      ? VIDEO_MODE_ULTRA_CINEMATIC
+      : body.videoMode === VIDEO_MODE_MULTI_IMAGE
+        ? VIDEO_MODE_MULTI_IMAGE
+        : VIDEO_MODE_BASIC;
     const format = normalizeAspectRatio(body.format || DEFAULT_VIDEO_ASPECT_RATIO);
     const overlays = body.overlays || {};
     const templateId = body.templateId || body.style || DEFAULT_PROMPT_TEMPLATE_ID;
@@ -74,6 +91,219 @@ export async function POST(request) {
     }
 
     const imageUrl = assertPublicImageUrl(listing.photos[0]);
+
+    if (isPremiumVideoMode(videoMode)) {
+      const requestedImageUrls = Array.isArray(body.selectedImageUrls) ? body.selectedImageUrls : [];
+      const selectedImageUrls = [...new Set(requestedImageUrls)]
+        .filter((url) => listing.photos.includes(url))
+        .map(assertPublicImageUrl);
+      const photoValidation = validatePremiumPhotoCount(selectedImageUrls.length);
+      if (!photoValidation.valid) {
+        return ok({ success: false, error: photoValidation.error }, { status: 400 });
+      }
+
+      const creditSnapshot = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { credits: true },
+      });
+      const creditValidation = validatePremiumCredits(creditSnapshot?.credits || 0);
+      if (!creditValidation.valid) {
+        return ok(
+          {
+            success: false,
+            error: creditValidation.error,
+            requiredCredits: creditValidation.requiredCredits,
+            currentCredits: creditValidation.currentCredits,
+          },
+          { status: 402 },
+        );
+      }
+
+      const providerMode = resolvePremiumProviderMode(process.env);
+      const realGuard = canUseRealPremiumProvider({
+        env: process.env,
+        providerMode,
+        user,
+        generationAction: body.generationAction,
+        videoMode,
+        selectedImageUrls,
+        currentCredits: creditSnapshot?.credits || 0,
+      });
+      const useRealProvider = realGuard.allowed;
+
+      if (providerMode === "real" && !useRealProvider) {
+        return ok(
+          {
+            success: false,
+            error: "Ultra Cinematic real generation did not pass the production safety checks.",
+            safety: {
+              providerMode,
+              photoValidation: realGuard.photoValidation,
+              creditValidation: realGuard.creditValidation,
+              requiresGenerationAction: PREMIUM_GENERATE_ACTION,
+            },
+          },
+          { status: 400 },
+        );
+      }
+
+      const scenePlan = buildPremiumScenePlan({
+        listing,
+        selectedImageUrls,
+        userPrompt,
+        style: templateId,
+      });
+      const audioOffOverlays = mergeAudioMetadataIntoOverlays({
+        ...overlays,
+        promptTemplateId: templateId,
+        sceneTemplateId,
+        premiumProviderMode: providerMode,
+        continuityMode: premiumVideoConfig.continuityMode,
+      }, {
+        audio_track_id: null,
+        audio_status: "none",
+        final_video_without_audio_url: null,
+        final_video_with_audio_url: null,
+        audio_error_message: null,
+      });
+
+      reservedVideo = await prisma.$transaction(async (tx) => {
+        if (useRealProvider) {
+          await reserveVideoGenerationCredits(tx, user.id, premiumVideoConfig.creditCost);
+        }
+
+        const video = await tx.video.create({
+          data: {
+            userId: user.id,
+            listingId: listing.id,
+            videoMode,
+            provider: useRealProvider ? "fal" : "mock",
+            model: premiumVideoConfig.modelId,
+            status: useRealProvider ? "planning" : "completed",
+            format,
+            duration: premiumVideoConfig.targetDurationSeconds,
+            style: templateId,
+            imageUrl: selectedImageUrls[0],
+            selectedImageUrls,
+            prompt: scenePlan.masterConcept,
+            negativePrompt: premiumNegativePrompt,
+            creditsCharged: useRealProvider ? premiumVideoConfig.creditCost : 0,
+            providerCostEstimate: null,
+            overlays: audioOffOverlays,
+            scenePlan,
+            providerRequests: [],
+            thumbnailUrl: selectedImageUrls[0],
+            rawProviderResponse: {
+              providerMode,
+              safety: {
+                realProviderAllowed: useRealProvider,
+                generationAction: body.generationAction || null,
+              },
+            },
+          },
+        });
+
+        if (useRealProvider) {
+          await recordVideoGenerationDebit(tx, {
+            userId: user.id,
+            videoId: video.id,
+            creditCost: premiumVideoConfig.creditCost,
+            note: "Ultra Cinematic generation: Kling 3.0 Pro, 60s",
+            model: premiumVideoConfig.modelId,
+            durationSeconds: premiumVideoConfig.targetDurationSeconds,
+            videoMode,
+          });
+        }
+
+        return video;
+      });
+
+      const provider = premiumProviderFactory({
+        mode: useRealProvider ? "real" : "mock",
+        jobId: reservedVideo.id,
+      });
+      const bridgeFrameService = createPremiumBridgeFrameService({
+        mode: useRealProvider ? "real" : "mock",
+      });
+      const generation = await submitPremiumVideoGeneration({
+        provider,
+        bridgeFrameService,
+        scenePlan,
+        jobId: reservedVideo.id,
+        aspectRatio: format,
+      });
+
+      if (!useRealProvider) {
+        const finalComposition = await composePremiumVideoClips({
+          jobId: reservedVideo.id,
+          generatedClips: generation.providerRequests,
+          scenePlan,
+          mock: true,
+        });
+
+        const video = await prisma.video.update({
+          where: { id: reservedVideo.id },
+          data: {
+            videoUrl: finalComposition.finalVideoUrl,
+            providerRequests: generation.providerRequests,
+            rawProviderResponse: {
+              providerMode,
+              providerRequests: generation.providerRequests,
+              finalComposition,
+              mock: true,
+              message: "Mock premium flow completed without Fal.ai calls or credit debit.",
+            },
+          },
+        });
+
+        return ok({
+          success: true,
+          provider: "mock",
+          videoMode,
+          model: premiumVideoConfig.modelId,
+          durationSeconds: premiumVideoConfig.targetDurationSeconds,
+          creditsCharged: 0,
+          selectedImageUrls,
+          videoUrl: video.videoUrl,
+          generationId: video.id,
+          videoId: video.id,
+          jobId: generation.primaryJobId,
+          providerMode,
+        });
+      }
+
+      const video = await prisma.video.update({
+        where: { id: reservedVideo.id },
+        data: {
+          status: "pending",
+          falJobId: generation.primaryJobId,
+          providerRequests: generation.providerRequests,
+          rawProviderResponse: {
+            providerMode,
+            providerRequests: generation.providerRequests,
+            safety: {
+              realProviderAllowed: true,
+              generationAction: body.generationAction,
+            },
+          },
+        },
+      });
+
+      return ok({
+        success: true,
+        provider: "fal",
+        videoMode,
+        model: premiumVideoConfig.modelId,
+        durationSeconds: premiumVideoConfig.targetDurationSeconds,
+        creditsCharged: premiumVideoConfig.creditCost,
+        selectedImageUrls,
+        videoUrl: null,
+        generationId: video.id,
+        videoId: video.id,
+        jobId: generation.primaryJobId,
+        providerMode,
+      });
+    }
 
     if (videoMode === VIDEO_MODE_MULTI_IMAGE) {
       const duration = requestedDuration === 30 ? 30 : 10;
@@ -244,11 +474,11 @@ export async function POST(request) {
       jobId: generation.jobId,
     });
   } catch (error) {
-    if (reservedVideo) {
+    if (reservedVideo && (reservedVideo.creditsCharged || 0) > 0) {
       await refundVideoGenerationCredits({
         userId: reservedVideo.userId,
         videoId: reservedVideo.id,
-        creditCost: reservedVideo.creditsCharged || VIDEO_GENERATION_CREDIT_COST,
+        creditCost: reservedVideo.creditsCharged,
         model: reservedVideo.model || FAL_VIDEO_MODEL_ID,
         durationSeconds: reservedVideo.duration || VIDEO_GENERATION_DURATION_SECONDS,
         videoMode: reservedVideo.videoMode || VIDEO_MODE_BASIC,
@@ -260,7 +490,7 @@ export async function POST(request) {
         {
           success: false,
           error: "Video generation failed. Credits were refunded.",
-          refundedCredits: reservedVideo.creditsCharged || VIDEO_GENERATION_CREDIT_COST,
+          refundedCredits: reservedVideo.creditsCharged,
         },
         { status: 500 },
       );
