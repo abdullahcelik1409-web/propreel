@@ -1,6 +1,7 @@
 import Link from "next/link";
 import CreditBadge from "@/components/CreditBadge";
 import BrandLogo from "@/components/BrandLogo";
+import SignOutButton from "@/components/SignOutButton";
 import { getSessionUser } from "@/lib/session";
 
 const nav = [
@@ -39,7 +40,10 @@ export default async function DashboardLayout({ children }) {
             <p className="pr-kicker">Real estate video platform</p>
             <p className="font-semibold text-[var(--pr-text)]">{user?.name || user?.email || "Viseo"}</p>
           </div>
-          <CreditBadge credits={user?.credits || 0} />
+          <div className="flex items-center gap-3">
+            <CreditBadge credits={user?.credits || 0} />
+            <SignOutButton />
+          </div>
         </header>
         <main className="p-4 sm:p-6">{children}</main>
       </div>
