@@ -2,12 +2,14 @@ import VideoGeneratorForm from "@/components/VideoGeneratorForm";
 import { getAudioTrackOptions } from "@/lib/audioTrackService";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function GenerateVideoPage({ params }) {
   const user = await getSessionUser();
+  if (!user) redirect("/auth/login");
+
   const { id } = await params;
   const listing = await prisma.listing.findFirst({ where: { id, userId: user.id } });
   if (!listing) notFound();

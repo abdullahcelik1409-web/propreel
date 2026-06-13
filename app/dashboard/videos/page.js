@@ -1,11 +1,14 @@
 import VideoCard from "@/components/VideoCard";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function VideosPage({ searchParams }) {
   const user = await getSessionUser();
+  if (!user) redirect("/auth/login");
+
   const params = await searchParams;
   const filter = params?.status || "all";
   const where = { userId: user.id, ...(filter !== "all" ? { status: filter } : {}) };

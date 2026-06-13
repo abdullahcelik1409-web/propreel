@@ -4,11 +4,14 @@ import VideoCard from "@/components/VideoCard";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
 import { MULTI_IMAGE_VIDEO_CREDIT_COSTS, VIDEO_GENERATION_CREDIT_COST } from "@/lib/videoConfig";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await getSessionUser();
+  if (!user) redirect("/auth/login");
+
   const [listings, videos] = await Promise.all([
     prisma.listing.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 4 }),
     prisma.video.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 4, include: { listing: true } }),

@@ -3,6 +3,7 @@ import CreditBadge from "@/components/CreditBadge";
 import BrandLogo from "@/components/BrandLogo";
 import SignOutButton from "@/components/SignOutButton";
 import { getSessionUser } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 const nav = [
   ["Dashboard", "/dashboard"],
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({ children }) {
   const user = await getSessionUser();
+  if (!user) redirect("/auth/login");
 
   return (
     <div className="pr-shell min-h-screen">

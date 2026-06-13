@@ -4,11 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
 import { getCreditPackagesWithPaymentLinks } from "@/lib/paymentConfig";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function CreditsPage() {
   const user = await getSessionUser();
+  if (!user) redirect("/auth/login");
+
   const events = await prisma.creditEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50 });
   const packages = getCreditPackagesWithPaymentLinks().map((pack) => ({
     ...pack,
