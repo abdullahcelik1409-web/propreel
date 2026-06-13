@@ -39,6 +39,11 @@ export async function POST(request) {
       ...result,
     });
   } catch (error) {
+    console.error("[shopier:webhook] request failed", {
+      status: error?.status || 500,
+      message: error?.message || "Shopier webhook failed.",
+    });
+
     return NextResponse.json(
       {
         received: false,
