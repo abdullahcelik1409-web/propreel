@@ -23,8 +23,16 @@ export async function POST(request) {
     const isMultipart = contentType.toLowerCase().includes("multipart/form-data");
     const parsedPayload = isMultipart ? formDataToPayload(await request.formData()) : null;
     const rawBody = parsedPayload ? JSON.stringify(parsedPayload) : await request.text();
+    const isShopierOsbEnvelope = Boolean(parsedPayload?.res && parsedPayload?.hash);
 
     const result = await processShopierWebhook({ rawBody, signatureHeader, authorizationHeader, contentType, parsedPayload });
+
+    if (isShopierOsbEnvelope) {
+      return new NextResponse("success", {
+        status: 200,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      });
+    }
 
     return NextResponse.json({
       received: true,
