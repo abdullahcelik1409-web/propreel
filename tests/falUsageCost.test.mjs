@@ -8,7 +8,8 @@ import {
   summarizeFalUsageResponse,
 } from "../lib/falUsageCost.mjs";
 
-test("Fal usage credentials prefer the normal FAL_KEY", () => {
+test("Fal usage credentials prefer FAL_ADMIN_KEY for usage APIs", () => {
+  assert.equal(getFalUsageCredentials({ FAL_ADMIN_KEY: "admin", FAL_KEY: "normal", FAL_API_KEY: "fallback" }), "admin");
   assert.equal(getFalUsageCredentials({ FAL_KEY: "normal", FAL_API_KEY: "fallback" }), "normal");
   assert.equal(getFalUsageCredentials({ FAL_API_KEY: "fallback" }), "fallback");
 });
