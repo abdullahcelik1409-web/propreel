@@ -1,4 +1,5 @@
 import AdminCreditsForm from "@/components/AdminCreditsForm";
+import AdminFalCostsPanel from "@/components/AdminFalCostsPanel";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -35,6 +36,8 @@ export default async function AdminPage() {
           <div className="pr-section-flat p-5"><p className="text-sm text-[var(--pr-muted)]">Total Videos Generated</p><p className="mt-2 text-3xl font-black">{totalVideos}</p></div>
           <div className="pr-section-flat p-5"><p className="text-sm text-[var(--pr-muted)]">Credits in Circulation</p><p className="mt-2 text-3xl font-black">{creditAggregate._sum.credits || 0}</p></div>
         </section>
+
+        <AdminFalCostsPanel />
 
         <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
           <table className="w-full text-left text-sm">
