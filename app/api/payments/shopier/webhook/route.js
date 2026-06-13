@@ -11,9 +11,10 @@ export async function POST(request) {
       request.headers.get("shopier-signature") ||
       request.headers.get("Shopier-Signature") ||
       request.headers.get("x-shopier-signature");
+    const authorizationHeader = request.headers.get("authorization") || "";
     const contentType = request.headers.get("content-type") || "";
 
-    const result = await processShopierWebhook({ rawBody, signatureHeader, contentType });
+    const result = await processShopierWebhook({ rawBody, signatureHeader, authorizationHeader, contentType });
 
     return NextResponse.json({
       received: true,
