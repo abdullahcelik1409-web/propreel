@@ -402,6 +402,12 @@ Every image you upload is saved locally (URL + thumbnail) so you never upload th
 
 ## 🚀 Quick Start
 
+### Paddle Billing
+
+Web ödeme altyapısı Paddle Billing ile çalışır. Kredi paketleri tek seferlik USD satış olarak yapılandırılır ve kredi yükleme sadece doğrulanmış Paddle webhook ile yapılır.
+
+Kurulum, env değişkenleri, Paddle dashboard product/price tablosu ve production checklist için [docs/PADDLE_BILLING_SETUP.md](docs/PADDLE_BILLING_SETUP.md) dosyasını kullanın.
+
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18+)

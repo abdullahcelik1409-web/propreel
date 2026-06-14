@@ -12,13 +12,31 @@ export default async function AdminPage() {
     throw error;
   });
 
-  const [users, totalVideos, creditAggregate] = await Promise.all([
+  const [users, totalVideos, creditAggregate, recentPayments] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       include: { _count: { select: { videos: true } } },
     }),
     prisma.video.count(),
     prisma.user.aggregate({ _sum: { credits: true } }),
+    prisma.paymentOrder.findMany({
+      where: { provider: "paddle" },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        providerOrderId: true,
+        providerCustomerId: true,
+        buyerEmail: true,
+        packageName: true,
+        packageId: true,
+        credits: true,
+        amount: true,
+        currency: true,
+        status: true,
+        createdAt: true,
+      },
+    }),
   ]);
   const adminUsers = users.map((user) => ({
     id: user.id,
@@ -38,7 +56,15 @@ export default async function AdminPage() {
           <p className="mt-1 text-sm text-[var(--pr-muted)]">Manage users, generated videos, and credit balances.</p>
         </div>
 
-        <AdminDashboardTabs users={adminUsers} totalVideos={totalVideos} creditsInCirculation={creditAggregate._sum.credits || 0} />
+        <AdminDashboardTabs
+          users={adminUsers}
+          totalVideos={totalVideos}
+          creditsInCirculation={creditAggregate._sum.credits || 0}
+          recentPayments={recentPayments.map((payment) => ({
+            ...payment,
+            createdAt: payment.createdAt.toISOString(),
+          }))}
+        />
       </div>
     </main>
   );

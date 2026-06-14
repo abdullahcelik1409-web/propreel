@@ -102,7 +102,7 @@ model CreditEvent {
 
 model PaymentOrder {
   id              String   @id @default(cuid())
-  provider        String   @default("shopier")
+  provider        String   @default("paddle")
   providerOrderId String   @unique
   providerEventId String?
   eventType       String?
@@ -116,6 +116,12 @@ model PaymentOrder {
   currency        String?
   buyerEmail      String?
   buyerName       String?
+  providerCustomerId String?
+  providerSubscriptionId String?
+  providerProductId String?
+  providerPriceId String?
+  internalOrderId String?
+  taxAmount       String?
   creditedAt      DateTime?
   rawPayload      Json?
   createdAt       DateTime @default(now())
@@ -125,6 +131,25 @@ model PaymentOrder {
   @@index([status])
   @@index([packageId])
   @@index([provider, providerOrderId])
+  @@index([providerPriceId])
+  @@index([internalOrderId])
+}
+
+model PaddleWebhookEvent {
+  id               String    @id @default(cuid())
+  eventId          String    @unique
+  eventType        String
+  occurredAt       DateTime?
+  processedAt      DateTime?
+  processingStatus String    @default("received")
+  payload          Json
+  errorMessage     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([eventType])
+  @@index([processingStatus])
+  @@index([createdAt])
 }
 
 model Account {

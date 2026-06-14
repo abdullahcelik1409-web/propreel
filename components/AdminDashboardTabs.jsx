@@ -9,7 +9,12 @@ function formatJoinDate(value) {
   return new Date(value).toLocaleDateString();
 }
 
-export default function AdminDashboardTabs({ users = [], totalVideos = 0, creditsInCirculation = 0 }) {
+function formatPaymentAmount(payment) {
+  if (!payment.amount) return "-";
+  return `${payment.amount} ${payment.currency || "USD"}`;
+}
+
+export default function AdminDashboardTabs({ users = [], totalVideos = 0, creditsInCirculation = 0, recentPayments = [] }) {
   const [activeTab, setActiveTab] = useState("management");
 
   return (
@@ -83,6 +88,45 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
                   <tr>
                     <td className="p-6 text-center text-[var(--pr-muted)]" colSpan={6}>
                       No users yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
+            <div className="border-b border-[var(--pr-border-soft)] bg-[#071010] p-4">
+              <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">Recent Paddle Payments</p>
+            </div>
+            <table className="w-full text-left text-sm">
+              <thead className="bg-[#071010] text-[var(--pr-muted)]">
+                <tr>
+                  <th className="p-3">Transaction</th>
+                  <th className="p-3">Customer</th>
+                  <th className="p-3">Package</th>
+                  <th className="p-3">Credits</th>
+                  <th className="p-3">Amount</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3">Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentPayments.map((payment) => (
+                  <tr key={payment.id} className="border-t border-[var(--pr-border-soft)]">
+                    <td className="max-w-48 truncate p-3 font-mono text-xs text-[var(--pr-muted)]">{payment.providerOrderId}</td>
+                    <td className="p-3">{payment.buyerEmail || payment.providerCustomerId || "-"}</td>
+                    <td className="p-3 text-[var(--pr-muted)]">{payment.packageName || payment.packageId || "-"}</td>
+                    <td className="p-3 font-semibold text-[var(--pr-cyan)]">{payment.credits}</td>
+                    <td className="p-3">{formatPaymentAmount(payment)}</td>
+                    <td className="p-3 text-[var(--pr-muted)]">{payment.status}</td>
+                    <td className="p-3 text-[var(--pr-muted)]">{formatJoinDate(payment.createdAt)}</td>
+                  </tr>
+                ))}
+                {!recentPayments.length && (
+                  <tr>
+                    <td className="p-6 text-center text-[var(--pr-muted)]" colSpan={7}>
+                      No Paddle payments yet.
                     </td>
                   </tr>
                 )}

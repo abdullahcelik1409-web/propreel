@@ -1,7 +1,7 @@
 import Link from "next/link";
 import MarketingNav from "@/components/MarketingNav";
 import PricingPlans from "@/components/PricingPlans";
-import { getCreditPackagesWithPaymentLinks } from "@/lib/paymentConfig";
+import { getCreditPackagesWithPaymentConfig } from "@/lib/paymentConfig";
 import { PRODUCTION_DEFAULT_USER_CREDITS } from "@/lib/videoConfig";
 
 const features = [
@@ -77,7 +77,7 @@ function FeatureIcon({ type }) {
 }
 
 export default function LandingPage() {
-  const packages = getCreditPackagesWithPaymentLinks().map((pack) => ({
+  const packages = getCreditPackagesWithPaymentConfig().map((pack) => ({
     ...pack,
     features: packageFeatures[pack.id] || [pack.description],
   }));

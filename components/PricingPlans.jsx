@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 
 function PlanIcon({ id }) {
   const className = "h-5 w-5";
@@ -51,22 +52,98 @@ function LockIcon() {
   );
 }
 
-function formatTry(amount) {
-  return `${Number(amount || 0).toLocaleString("tr-TR")} TL`;
+function formatUsd(amount) {
+  return `$${Number(amount || 0).toLocaleString("en-US")}`;
+}
+
+async function initializePaddle({ clientToken, environment, successUrl }) {
+  if (!clientToken) throw new Error("Paddle client token is not configured.");
+  if (!window.Paddle) throw new Error("Paddle.js is not loaded yet.");
+
+  if (environment === "sandbox") {
+    window.Paddle.Environment.set("sandbox");
+  }
+
+  if (!window.__viseoPaddleInitialized) {
+    window.Paddle.Initialize({
+      token: clientToken,
+      checkout: {
+        settings: {
+          displayMode: "overlay",
+          theme: "dark",
+          locale: "en",
+          ...(successUrl ? { successUrl } : {}),
+        },
+      },
+      eventCallback: (event) => {
+        if (event?.name === "checkout.completed" && successUrl) {
+          window.location.href = successUrl;
+        }
+      },
+    });
+    window.__viseoPaddleInitialized = true;
+  }
 }
 
 export default function PricingPlans({ packages, compact = false }) {
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [checkoutError, setCheckoutError] = useState("");
+  const [loadingPackageId, setLoadingPackageId] = useState("");
+  const [paddleReady, setPaddleReady] = useState(false);
+
+  async function startCheckout(pack) {
+    setCheckoutError("");
+    setLoadingPackageId(pack.id);
+
+    try {
+      const response = await fetch("/api/payments/paddle/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ packageId: pack.id }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401 && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Could not start Paddle checkout.");
+      }
+
+      if (data.clientToken && data.transactionId) {
+        await initializePaddle(data);
+        window.Paddle.Checkout.open({
+          transactionId: data.transactionId,
+        });
+        return;
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
+      throw new Error("Paddle checkout response is missing checkout details.");
+    } catch (error) {
+      setSelectedPackage(pack);
+      setCheckoutError(error?.message || "Could not start Paddle checkout.");
+    } finally {
+      setLoadingPackageId("");
+    }
+  }
 
   return (
     <>
+      <Script src="https://cdn.paddle.com/paddle/v2/paddle.js" strategy="afterInteractive" onLoad={() => setPaddleReady(true)} />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {packages.map((pack) => {
           const premium = pack.id === "pro_credits_25000" || pack.id === "premium_credits_50000";
           const flagship = pack.id === "premium_credits_50000";
-          const hasPaymentUrl = Boolean(pack.paymentUrl);
           const highlighted = pack.badge === "Most Popular";
           const badge = pack.badge || null;
+          const loading = loadingPackageId === pack.id;
 
           return (
             <article
@@ -103,8 +180,8 @@ export default function PricingPlans({ packages, compact = false }) {
               </div>
               <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">{pack.name}</p>
               <div className="mt-3 flex items-end gap-2">
-                <p className="text-4xl font-black tabular-nums text-white">{formatTry(pack.priceTry)}</p>
-                <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">TRY / one-time</p>
+                <p className="text-4xl font-black tabular-nums text-white">{formatUsd(pack.priceUsd)}</p>
+                <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">USD / one-time</p>
               </div>
               <p className="mt-2 text-lg font-bold text-[var(--pr-muted)]">{pack.credits.toLocaleString("en-US")} credits</p>
               <p className="mt-3 min-h-12 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
@@ -118,16 +195,17 @@ export default function PricingPlans({ packages, compact = false }) {
                   ))}
                 </ul>
               )}
-              {hasPaymentUrl ? (
-                <a href={pack.paymentUrl} target="_blank" rel="noopener noreferrer" className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
-                  <LockIcon /> Buy Now
-                </a>
-              ) : (
-                <button type="button" onClick={() => setSelectedPackage(pack)} className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm">
-                  <LockIcon /> Buy Now
-                </button>
-              )}
-              <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">Secure / Shopier</p>
+              <button
+                type="button"
+                onClick={() => startCheckout(pack)}
+                disabled={loading}
+                className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                <LockIcon /> {loading ? "Opening Paddle..." : "Buy Now"}
+              </button>
+              <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">
+                Secure checkout by Paddle{!paddleReady ? " loading" : ""}
+              </p>
             </article>
           );
         })}
@@ -139,14 +217,12 @@ export default function PricingPlans({ packages, compact = false }) {
             <p className="pr-kicker">Secure payment</p>
             <h2 className="mt-2 text-xl font-black">{selectedPackage.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">
-              Secure Shopier payment links will be enabled after account approval. Until then, contact us for purchase and application questions.
+              Paddle checkout could not be opened automatically. Confirm the Paddle environment variables and price ID for this package, then try again.
             </p>
             <p className="mt-3 rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-3 text-sm font-semibold text-[var(--pr-cyan)]">
-              {selectedPackage.credits.toLocaleString("en-US")} credits / {formatTry(selectedPackage.priceTry)}
+              {selectedPackage.credits.toLocaleString("en-US")} credits / {formatUsd(selectedPackage.priceUsd)}
             </p>
-            <p className="mt-3 text-xs leading-5 text-[var(--pr-dim)]">
-              After Shopier approves the account, this package will open the matching Shopier payment link directly.
-            </p>
+            {checkoutError && <p className="mt-3 text-xs leading-5 text-amber-200">{checkoutError}</p>}
             <div className="mt-5 flex justify-end gap-2">
               <button
                 type="button"
