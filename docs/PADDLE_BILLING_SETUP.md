@@ -51,6 +51,8 @@ PADDLE_PRICE_ID_PREMIUM_CREDITS_50000=
 
 `PADDLE_API_KEY` ve `PADDLE_WEBHOOK_SECRET` sadece server tarafında kalmalıdır. Frontend tarafında yalnızca `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` kullanılabilir.
 
+Local, preview ve production env alanlarında eski ödeme sağlayıcı değişkenleri tutulmamalıdır. Deploy öncesi Vercel environment variables, `.env.local` ve benzeri dosyalar sadece Paddle Billing anahtarlarını ve mevcut uygulama değişkenlerini içermelidir.
+
 ## Akış
 
 1. Kullanıcı pricing veya credits sayfasında paket seçer.
@@ -90,6 +92,7 @@ PADDLE_PRICE_ID_PREMIUM_CREDITS_50000=
 - [ ] `PADDLE_ENVIRONMENT=production`
 - [ ] API key server env'de
 - [ ] Client token frontend env'de
+- [ ] Eski ödeme sağlayıcı env değişkenleri local/preview/production ortamlarından kaldırıldı
 - [ ] Test ödeme yapıldı
 - [ ] Webhook geldi
 - [ ] Kredi yüklendi
