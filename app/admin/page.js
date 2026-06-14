@@ -1,5 +1,4 @@
-import AdminCreditsForm from "@/components/AdminCreditsForm";
-import AdminFalCostsPanel from "@/components/AdminFalCostsPanel";
+import AdminDashboardTabs from "@/components/AdminDashboardTabs";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -21,6 +20,14 @@ export default async function AdminPage() {
     prisma.video.count(),
     prisma.user.aggregate({ _sum: { credits: true } }),
   ]);
+  const adminUsers = users.map((user) => ({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    credits: user.credits,
+    createdAt: user.createdAt.toISOString(),
+    videoCount: user._count.videos,
+  }));
 
   return (
     <main className="pr-shell min-h-screen p-6">
@@ -31,34 +38,7 @@ export default async function AdminPage() {
           <p className="mt-1 text-sm text-[var(--pr-muted)]">Manage users, generated videos, and credit balances.</p>
         </div>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <div className="pr-section-flat p-5"><p className="text-sm text-[var(--pr-muted)]">Total Users</p><p className="mt-2 text-3xl font-black">{users.length}</p></div>
-          <div className="pr-section-flat p-5"><p className="text-sm text-[var(--pr-muted)]">Total Videos Generated</p><p className="mt-2 text-3xl font-black">{totalVideos}</p></div>
-          <div className="pr-section-flat p-5"><p className="text-sm text-[var(--pr-muted)]">Credits in Circulation</p><p className="mt-2 text-3xl font-black">{creditAggregate._sum.credits || 0}</p></div>
-        </section>
-
-        <AdminFalCostsPanel />
-
-        <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-[#071010] text-[var(--pr-muted)]">
-              <tr><th className="p-3">Email</th><th className="p-3">Name</th><th className="p-3">Credits</th><th className="p-3">Videos Created</th><th className="p-3">Join Date</th><th className="p-3">Actions</th></tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-t border-[var(--pr-border-soft)]">
-                  <td className="p-3">{user.email}</td>
-                  <td className="p-3 text-[var(--pr-muted)]">{user.name || "-"}</td>
-                  <td className="p-3 font-semibold text-[var(--pr-cyan)]">{user.credits}</td>
-                  <td className="p-3">{user._count.videos}</td>
-                  <td className="p-3 text-[var(--pr-muted)]">{new Date(user.createdAt).toLocaleDateString()}</td>
-                  <td className="p-3"><AdminCreditsForm email={user.email} /></td>
-                </tr>
-              ))}
-              {!users.length && <tr><td className="p-6 text-center text-[var(--pr-muted)]" colSpan={6}>No users yet.</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <AdminDashboardTabs users={adminUsers} totalVideos={totalVideos} creditsInCirculation={creditAggregate._sum.credits || 0} />
       </div>
     </main>
   );

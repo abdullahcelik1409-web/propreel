@@ -18,9 +18,10 @@ test("Fal usage response summary totals cost by currency", () => {
   const summary = summarizeFalUsageResponse({
     time_series: [
       {
+        bucket: "2026-06-14T00:00:00Z",
         results: [
-          { cost: 0.4, currency: "USD" },
-          { cost: "0.6", currency: "USD" },
+          { endpoint_id: "fal-ai/model-a", unit: "second", quantity: 4, cost: 0.4, currency: "USD", auth_method: "Production Key" },
+          { endpoint_id: "fal-ai/model-b", unit: "image", quantity: 2, cost: "0.6", currency: "USD", auth_method: "Production Key" },
         ],
       },
     ],
@@ -29,6 +30,10 @@ test("Fal usage response summary totals cost by currency", () => {
   assert.equal(summary.cost, 1);
   assert.equal(summary.currency, "USD");
   assert.equal(summary.lineItemCount, 2);
+  assert.equal(summary.totalQuantity, 6);
+  assert.equal(summary.timeSeries[0].cost, 1);
+  assert.equal(summary.endpointBreakdown.length, 2);
+  assert.equal(summary.authMethodBreakdown[0].label, "Production Key");
 });
 
 test("local date string respects the configured dashboard timezone", () => {
@@ -39,6 +44,41 @@ test("Fal cost summary fetches real usage windows without mock values", async ()
   const calledUrls = [];
   const fetchImpl = async (url, options) => {
     calledUrls.push({ url: String(url), authorization: options.headers.Authorization });
+    if (String(url).includes("/account/billing")) {
+      return {
+        ok: true,
+        async json() {
+          return {
+            username: "workspace",
+            credits: { current_balance: 12.5, currency: "USD" },
+          };
+        },
+      };
+    }
+
+    if (String(url).includes("/models/billing-events")) {
+      return {
+        ok: true,
+        async json() {
+          return {
+            billing_events: [
+              {
+                request_id: "request_1",
+                endpoint_id: "fal-ai/model-a",
+                timestamp: "2026-06-14T09:00:00Z",
+                output_units: 1,
+                unit_price: 0.1,
+                percent_discount: null,
+                cost_estimate_nano_usd: 100000000,
+              },
+            ],
+            next_cursor: null,
+            has_more: false,
+          };
+        },
+      };
+    }
+
     return {
       ok: true,
       async json() {
@@ -46,7 +86,7 @@ test("Fal cost summary fetches real usage windows without mock values", async ()
           time_series: [
             {
               bucket: "2026-06-14T00:00:00Z",
-              results: [{ cost: 1.25, currency: "USD" }],
+              results: [{ endpoint_id: "fal-ai/model-a", unit: "second", quantity: 5, cost: 1.25, currency: "USD", auth_method: "normal-key" }],
             },
           ],
           next_cursor: null,
@@ -62,10 +102,12 @@ test("Fal cost summary fetches real usage windows without mock values", async ()
     now: new Date("2026-06-14T09:00:00.000Z"),
   });
 
-  assert.equal(calledUrls.length, 4);
+  assert.equal(calledUrls.length, 6);
   assert.ok(calledUrls.every((call) => call.authorization === "Key normal-key"));
   assert.equal(summary.windows.allTime.cost, 1.25);
   assert.equal(summary.windows.last30Days.cost, 1.25);
   assert.equal(summary.windows.last7Days.cost, 1.25);
   assert.equal(summary.windows.today.cost, 1.25);
+  assert.equal(summary.accountBilling.credits.currentBalance, 12.5);
+  assert.equal(summary.recentBillingEvents[0].costEstimateUsd, 0.1);
 });
