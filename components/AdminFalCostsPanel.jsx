@@ -188,9 +188,14 @@ export default function AdminFalCostsPanel() {
             {trend.length ? (
               trend.map((bucket) => {
                 const height = trendMax ? Math.max(4, (Number(bucket.cost || 0) / trendMax) * 100) : 0;
+                const hasSpend = Number(bucket.cost || 0) > 0;
                 return (
-                  <div key={bucket.bucket} className="group flex min-w-0 flex-1 flex-col items-center justify-end gap-2">
-                    <div className="w-full rounded-t-sm bg-[var(--pr-cyan)] transition group-hover:bg-white" style={{ height: `${height}%` }} title={`${formatBucketLabel(bucket.bucket)} - ${formatCost(bucket.cost)}`} />
+                  <div key={bucket.bucket} className="group flex h-full min-w-0 flex-1 flex-col justify-end">
+                    <div
+                      className={`w-full rounded-t-sm transition group-hover:bg-white ${hasSpend ? "bg-[var(--pr-cyan)]" : "bg-[rgba(255,255,255,0.14)]"}`}
+                      style={{ height: `${height}%` }}
+                      title={`${formatBucketLabel(bucket.bucket)} - ${formatCost(bucket.cost)}`}
+                    />
                   </div>
                 );
               })
