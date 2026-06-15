@@ -20,7 +20,7 @@ export default async function AdminPage() {
     prisma.video.count(),
     prisma.user.aggregate({ _sum: { credits: true } }),
     prisma.paymentOrder.findMany({
-      where: { provider: "paddle" },
+      where: { provider: "lemon_squeezy" },
       orderBy: { createdAt: "desc" },
       take: 20,
       select: {

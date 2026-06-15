@@ -14,11 +14,11 @@ const faqs = [
   ],
   [
     "Which payment methods are accepted?",
-    "Payments are priced in USD and processed through Paddle Checkout. Available methods can include cards, Apple Pay, Google Pay, and PayPal depending on buyer location.",
+    "Payments are priced in USD and processed through Lemon Squeezy Checkout. Available methods can include cards, Apple Pay, Google Pay, and PayPal depending on buyer location.",
   ],
   [
     "Is my payment information secure?",
-    "Yes. Payments are handled by Paddle as merchant of record. Viseo never stores your card details.",
+    "Yes. Payments are handled by Lemon Squeezy as merchant of record. Viseo never stores your card details.",
   ],
 ];
 

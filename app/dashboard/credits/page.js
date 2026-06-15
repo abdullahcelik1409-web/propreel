@@ -15,7 +15,7 @@ export default async function CreditsPage() {
   const events = await prisma.creditEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50 });
   const packages = getCreditPackagesWithPaymentConfig().map((pack) => ({
     ...pack,
-    features: ["Secure Paddle Checkout", "Webhook-confirmed digital credit delivery", "No subscription"],
+    features: ["Secure Lemon Squeezy Checkout", "Webhook-confirmed digital credit delivery", "No subscription"],
   }));
 
   return (
@@ -25,7 +25,7 @@ export default async function CreditsPage() {
         <div className="mt-3"><CreditBadge credits={user.credits} /></div>
       </div>
       <div className="flex flex-col gap-3 rounded-lg border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)] md:flex-row md:items-center md:justify-between">
-        <span>Buy digital credits through secure Paddle Checkout.</span>
+        <span>Buy digital credits through secure Lemon Squeezy Checkout.</span>
         <Link href="/pricing" className="pr-primary px-4 py-2 text-center text-sm">
           View Pricing
         </Link>

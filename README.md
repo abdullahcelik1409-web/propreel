@@ -402,11 +402,11 @@ Every image you upload is saved locally (URL + thumbnail) so you never upload th
 
 ## 🚀 Quick Start
 
-### Paddle Billing
+### Lemon Squeezy
 
-Web ödeme altyapısı Paddle Billing ile çalışır. Kredi paketleri tek seferlik USD satış olarak yapılandırılır ve kredi yükleme sadece doğrulanmış Paddle webhook ile yapılır.
+Web ödeme altyapısı Lemon Squeezy ile çalışır. Kredi paketleri tek seferlik USD satış olarak yapılandırılır ve kredi yükleme sadece doğrulanmış Lemon Squeezy webhook ile yapılır.
 
-Kurulum, env değişkenleri, Paddle dashboard product/price tablosu ve production checklist için [docs/PADDLE_BILLING_SETUP.md](docs/PADDLE_BILLING_SETUP.md) dosyasını kullanın.
+Kurulum, env değişkenleri, Lemon Squeezy store/product/variant tablosu ve başvuru checklist'i için [docs/LEMON_SQUEEZY_SETUP.md](docs/LEMON_SQUEEZY_SETUP.md) dosyasını kullanın.
 
 ### Prerequisites
 

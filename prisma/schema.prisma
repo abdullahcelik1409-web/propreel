@@ -102,7 +102,7 @@ model CreditEvent {
 
 model PaymentOrder {
   id              String   @id @default(cuid())
-  provider        String   @default("paddle")
+  provider        String   @default("lemon_squeezy")
   providerOrderId String   @unique
   providerEventId String?
   eventType       String?
@@ -135,7 +135,7 @@ model PaymentOrder {
   @@index([internalOrderId])
 }
 
-model PaddleWebhookEvent {
+model LemonSqueezyWebhookEvent {
   id               String    @id @default(cuid())
   eventId          String    @unique
   eventType        String

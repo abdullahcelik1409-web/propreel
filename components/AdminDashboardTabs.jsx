@@ -97,7 +97,7 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
 
           <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
             <div className="border-b border-[var(--pr-border-soft)] bg-[#071010] p-4">
-              <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">Recent Paddle Payments</p>
+              <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">Recent Lemon Squeezy Payments</p>
             </div>
             <table className="w-full text-left text-sm">
               <thead className="bg-[#071010] text-[var(--pr-muted)]">
@@ -126,7 +126,7 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
                 {!recentPayments.length && (
                   <tr>
                     <td className="p-6 text-center text-[var(--pr-muted)]" colSpan={7}>
-                      No Paddle payments yet.
+                      No Lemon Squeezy payments yet.
                     </td>
                   </tr>
                 )}

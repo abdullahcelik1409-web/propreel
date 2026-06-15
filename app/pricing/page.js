@@ -51,7 +51,7 @@ export default function PricingPage() {
           <p className="pr-kicker">Pricing</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent USD credit packages</h1>
           <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
-            Buy digital credits and use them to generate real estate marketing videos. Payments are processed securely by Paddle as merchant of record.
+            Buy digital credits and use them to generate real estate marketing videos. Payments are processed securely by Lemon Squeezy as merchant of record.
           </p>
         </div>
         <div className="mt-10">
@@ -62,11 +62,11 @@ export default function PricingPage() {
           <p className="pr-kicker">Purchase notes</p>
           <div className="mt-4 grid gap-3 text-sm leading-7 text-[var(--pr-muted)] md:grid-cols-2">
             <p>- Credits are delivered digitally to your Viseo account after payment confirmation.</p>
-            <p>- Paddle Checkout opens securely when a package is selected.</p>
-            <p>- Payments are priced in USD. Taxes and final totals may be calculated by Paddle at checkout.</p>
+            <p>- Lemon Squeezy Checkout opens securely when a package is selected.</p>
+            <p>- Payments are priced in USD. Taxes and final totals may be calculated by Lemon Squeezy at checkout.</p>
             <p>- No subscription; one-time purchase.</p>
             <p>- Unused credits are refundable; see our Cancellation Policy.</p>
-            <p>- Card, Apple Pay, Google Pay, and PayPal availability depends on Paddle checkout settings and buyer location.</p>
+            <p>- Card, Apple Pay, Google Pay, and PayPal availability depends on Lemon Squeezy checkout settings and buyer location.</p>
             <p>
               - Basic videos use {VIDEO_GENERATION_CREDIT_COST} credits. Multi Image videos use {MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits for 10s or{" "}
               {MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits for 30s.

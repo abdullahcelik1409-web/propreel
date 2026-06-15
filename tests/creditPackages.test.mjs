@@ -77,12 +77,12 @@ test("Most Popular badge is assigned to the higher Pro package only", () => {
   assert.equal(CREDIT_PACKAGES.find((pack) => pack.id === "premium_credits_50000")?.badge, undefined);
 });
 
-test("Paddle env keys follow the configured checkout and webhook mapping", async () => {
+test("Lemon Squeezy env keys follow the configured checkout and webhook mapping", async () => {
   const paymentConfig = await readFile(new URL("../lib/paymentConfig.js", import.meta.url), "utf8");
 
-  assert.match(paymentConfig, /pro_credits_25000:\s*"PADDLE_PRICE_ID_PRO_CREDITS_25000"/);
-  assert.match(paymentConfig, /premium_credits_50000:\s*"PADDLE_PRICE_ID_PREMIUM_CREDITS_50000"/);
-  assert.match(paymentConfig, /pro_credits_25000:\s*"PADDLE_PRODUCT_ID_PRO_CREDITS_25000"/);
-  assert.match(paymentConfig, /premium_credits_50000:\s*"PADDLE_PRODUCT_ID_PREMIUM_CREDITS_50000"/);
-  assert.match(paymentConfig, /PADDLE_PRICE_ID_STARTER_CREDITS/);
+  assert.match(paymentConfig, /pro_credits_25000:\s*"LEMON_SQUEEZY_VARIANT_ID_PRO_CREDITS_25000"/);
+  assert.match(paymentConfig, /premium_credits_50000:\s*"LEMON_SQUEEZY_VARIANT_ID_PREMIUM_CREDITS_50000"/);
+  assert.match(paymentConfig, /pro_credits_25000:\s*"LEMON_SQUEEZY_PRODUCT_ID_PRO_CREDITS_25000"/);
+  assert.match(paymentConfig, /premium_credits_50000:\s*"LEMON_SQUEEZY_PRODUCT_ID_PREMIUM_CREDITS_50000"/);
+  assert.match(paymentConfig, /LEMON_SQUEEZY_VARIANT_ID_STARTER_CREDITS/);
 });

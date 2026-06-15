@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Script from "next/script";
 
 function PlanIcon({ id }) {
   const className = "h-5 w-5";
@@ -56,47 +55,17 @@ function formatUsd(amount) {
   return `$${Number(amount || 0).toLocaleString("en-US")}`;
 }
 
-async function initializePaddle({ clientToken, environment, successUrl }) {
-  if (!clientToken) throw new Error("Paddle client token is not configured.");
-  if (!window.Paddle) throw new Error("Paddle.js is not loaded yet.");
-
-  if (environment === "sandbox") {
-    window.Paddle.Environment.set("sandbox");
-  }
-
-  if (!window.__viseoPaddleInitialized) {
-    window.Paddle.Initialize({
-      token: clientToken,
-      checkout: {
-        settings: {
-          displayMode: "overlay",
-          theme: "dark",
-          locale: "en",
-          ...(successUrl ? { successUrl } : {}),
-        },
-      },
-      eventCallback: (event) => {
-        if (event?.name === "checkout.completed" && successUrl) {
-          window.location.href = successUrl;
-        }
-      },
-    });
-    window.__viseoPaddleInitialized = true;
-  }
-}
-
 export default function PricingPlans({ packages, compact = false }) {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [checkoutError, setCheckoutError] = useState("");
   const [loadingPackageId, setLoadingPackageId] = useState("");
-  const [paddleReady, setPaddleReady] = useState(false);
 
   async function startCheckout(pack) {
     setCheckoutError("");
     setLoadingPackageId(pack.id);
 
     try {
-      const response = await fetch("/api/payments/paddle/checkout", {
+      const response = await fetch("/api/payments/lemon-squeezy/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ packageId: pack.id }),
@@ -109,15 +78,7 @@ export default function PricingPlans({ packages, compact = false }) {
       }
 
       if (!response.ok) {
-        throw new Error(data.error || "Could not start Paddle checkout.");
-      }
-
-      if (data.clientToken && data.transactionId) {
-        await initializePaddle(data);
-        window.Paddle.Checkout.open({
-          transactionId: data.transactionId,
-        });
-        return;
+        throw new Error(data.error || "Could not start Lemon Squeezy checkout.");
       }
 
       if (data.checkoutUrl) {
@@ -125,10 +86,10 @@ export default function PricingPlans({ packages, compact = false }) {
         return;
       }
 
-      throw new Error("Paddle checkout response is missing checkout details.");
+      throw new Error("Lemon Squeezy checkout response is missing checkout details.");
     } catch (error) {
       setSelectedPackage(pack);
-      setCheckoutError(error?.message || "Could not start Paddle checkout.");
+      setCheckoutError(error?.message || "Could not start Lemon Squeezy checkout.");
     } finally {
       setLoadingPackageId("");
     }
@@ -136,7 +97,6 @@ export default function PricingPlans({ packages, compact = false }) {
 
   return (
     <>
-      <Script src="https://cdn.paddle.com/paddle/v2/paddle.js" strategy="afterInteractive" onLoad={() => setPaddleReady(true)} />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {packages.map((pack) => {
           const premium = pack.id === "pro_credits_25000" || pack.id === "premium_credits_50000";
@@ -201,10 +161,10 @@ export default function PricingPlans({ packages, compact = false }) {
                 disabled={loading}
                 className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <LockIcon /> {loading ? "Opening Paddle..." : "Buy Now"}
+                <LockIcon /> {loading ? "Opening checkout..." : "Buy Now"}
               </button>
               <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">
-                Secure checkout by Paddle{!paddleReady ? " loading" : ""}
+                Secure checkout by Lemon Squeezy
               </p>
             </article>
           );
@@ -217,7 +177,7 @@ export default function PricingPlans({ packages, compact = false }) {
             <p className="pr-kicker">Secure payment</p>
             <h2 className="mt-2 text-xl font-black">{selectedPackage.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">
-              Paddle checkout could not be opened automatically. Confirm the Paddle environment variables and price ID for this package, then try again.
+              Lemon Squeezy checkout could not be opened automatically. Confirm the Lemon Squeezy environment variables and variant ID for this package, then try again.
             </p>
             <p className="mt-3 rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-3 text-sm font-semibold text-[var(--pr-cyan)]">
               {selectedPackage.credits.toLocaleString("en-US")} credits / {formatUsd(selectedPackage.priceUsd)}

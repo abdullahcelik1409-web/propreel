@@ -1,29 +1,29 @@
 import { NextResponse } from "next/server";
-import { processPaddleWebhook } from "@/lib/paddleWebhook";
+import { processLemonSqueezyWebhook } from "@/lib/lemonSqueezyWebhook";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
-    const signatureHeader = request.headers.get("paddle-signature");
+    const signatureHeader = request.headers.get("x-signature");
     const rawBody = await request.text();
-    const result = await processPaddleWebhook({ rawBody, signatureHeader });
+    const result = await processLemonSqueezyWebhook({ rawBody, signatureHeader });
 
     return NextResponse.json({
       received: true,
       ...result,
     });
   } catch (error) {
-    console.error("[paddle:webhook] request failed", {
+    console.error("[lemon-squeezy:webhook] request failed", {
       status: error?.status || 500,
-      message: error?.message || "Paddle webhook failed.",
+      message: error?.message || "Lemon Squeezy webhook failed.",
     });
 
     return NextResponse.json(
       {
         received: false,
-        error: error?.message || "Paddle webhook failed.",
+        error: error?.message || "Lemon Squeezy webhook failed.",
       },
       { status: error?.status || 500 },
     );

@@ -69,7 +69,7 @@ export default function ContactPage() {
 
           <div className="mt-6 rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-4 text-sm leading-7 text-[var(--pr-muted)]">
             <p className="font-bold text-white">Support topics</p>
-            <p className="mt-2">Digital credit delivery, refund requests, failed video generation, account access, and Paddle checkout questions.</p>
+            <p className="mt-2">Digital credit delivery, refund requests, failed video generation, account access, and Lemon Squeezy checkout questions.</p>
           </div>
         </div>
       </section>
