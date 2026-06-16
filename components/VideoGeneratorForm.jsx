@@ -190,12 +190,16 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           overlays,
         }),
       });
-      const result = await response.json();
+      const rawResponse = await response.text();
+      const result = rawResponse ? JSON.parse(rawResponse) : {};
       if (!response.ok || result.success === false) throw new Error(result.error || "Could not start generation");
       router.push("/dashboard/videos");
       router.refresh();
     } catch (err) {
-      setError(err.message);
+      const message = err instanceof SyntaxError
+        ? "The server returned an invalid response while starting generation. Please try again."
+        : err?.message || "Could not start generation";
+      setError(message);
     } finally {
       setLoading(false);
     }
