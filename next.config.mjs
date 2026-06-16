@@ -11,6 +11,7 @@ const createNextConfig = (phase) => {
 
   return {
     transpilePackages: ['studio', 'ai-agent', 'workflow-builder', 'design-agent'],
+    serverExternalPackages: ['sharp'],
     outputFileTracingRoot: __dirname,
     distDir: isDev || isVercel ? '.next' : '.next-build',
   };
