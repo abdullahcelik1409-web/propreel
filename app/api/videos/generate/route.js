@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { fail, ok } from "@/lib/api";
 import {
   generatePropertyVideo,
@@ -14,6 +15,7 @@ import { getAudioTrackById } from "@/lib/audioTrackService";
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
 import { premiumProviderFactory, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
+import { prepareReferenceImagesForVideo } from "@/lib/videoReferenceImageService";
 import {
   recordVideoGenerationDebit,
   refundVideoGenerationCredits,
@@ -47,6 +49,23 @@ import {
   VIDEO_GENERATION_CREDIT_COST,
   VIDEO_GENERATION_DURATION_SECONDS,
 } from "@/lib/videoConfig";
+
+function applyPreparedReferencesToPremiumScenePlan(scenePlan, referencePreparation) {
+  if (!referencePreparation?.processed) return scenePlan;
+
+  const urlMap = new Map(
+    referencePreparation.references.map((reference) => [reference.originalUrl, reference.processedUrl]),
+  );
+
+  return {
+    ...scenePlan,
+    scenes: scenePlan.scenes.map((scene) => ({
+      ...scene,
+      sourcePhotoUrl: urlMap.get(scene.sourcePhotoUrl) || scene.sourcePhotoUrl,
+      targetPhotoUrl: urlMap.get(scene.targetPhotoUrl) || scene.targetPhotoUrl,
+    })),
+  };
+}
 
 export async function POST(request) {
   let reservedVideo = null;
@@ -220,10 +239,19 @@ export async function POST(request) {
       const bridgeFrameService = createPremiumBridgeFrameService({
         mode: useRealProvider ? "real" : "mock",
       });
+      const referencePreparation = useRealProvider
+        ? await prepareReferenceImagesForVideo({
+          imageUrls: selectedImageUrls,
+          format,
+          userId: user.id,
+          jobId: reservedVideo.id,
+        })
+        : null;
+      const providerScenePlan = applyPreparedReferencesToPremiumScenePlan(scenePlan, referencePreparation);
       const generation = await submitPremiumVideoGeneration({
         provider,
         bridgeFrameService,
-        scenePlan,
+        scenePlan: providerScenePlan,
         jobId: reservedVideo.id,
         aspectRatio: format,
       });
@@ -233,7 +261,7 @@ export async function POST(request) {
         const finalComposition = await composePremiumVideoClips({
           jobId: reservedVideo.id,
           generatedClips: generation.providerRequests,
-          scenePlan,
+          scenePlan: providerScenePlan,
           mock: true,
         });
 
@@ -245,6 +273,7 @@ export async function POST(request) {
             rawProviderResponse: {
               providerMode,
               providerRequests: generation.providerRequests,
+              referenceImages: referencePreparation,
               finalComposition,
               mock: true,
               message: "Mock premium flow completed without Fal.ai calls or credit debit.",
@@ -277,6 +306,7 @@ export async function POST(request) {
           rawProviderResponse: {
             providerMode,
             providerRequests: generation.providerRequests,
+            referenceImages: referencePreparation,
             safety: {
               realProviderAllowed: true,
               generationAction: body.generationAction,
@@ -336,9 +366,15 @@ export async function POST(request) {
         );
       }
 
+      const referencePreparation = await prepareReferenceImagesForVideo({
+        imageUrls: selectedImageUrls,
+        format,
+        userId: user.id,
+        jobId: `multi-${randomUUID()}`,
+      });
       const generation = await submitMultiImageVideoGeneration({
         listing,
-        imageUrls: selectedImageUrls,
+        imageUrls: referencePreparation.imageUrls,
         templateId,
         sceneTemplateId,
         prompt: userPrompt,
@@ -377,6 +413,7 @@ export async function POST(request) {
             falJobId: generation.primaryJobId,
             rawProviderResponse: {
               providerRequests: generation.providerRequests,
+              referenceImages: referencePreparation,
             },
           },
         });
@@ -441,7 +478,14 @@ export async function POST(request) {
       return video;
     });
 
-    const generation = await generatePropertyVideo([imageUrl], {
+    const referencePreparation = await prepareReferenceImagesForVideo({
+      imageUrls: [imageUrl],
+      format,
+      userId: user.id,
+      jobId: reservedVideo.id,
+    });
+    const providerImageUrl = referencePreparation.imageUrls[0] || imageUrl;
+    const generation = await generatePropertyVideo([providerImageUrl], {
       aspectRatio: format,
       listing,
       prompt,
@@ -453,7 +497,10 @@ export async function POST(request) {
       where: { id: reservedVideo.id },
       data: {
         falJobId: generation.jobId,
-        rawProviderResponse: generation.raw,
+        rawProviderResponse: {
+          ...(generation.raw && typeof generation.raw === "object" ? generation.raw : { raw: generation.raw }),
+          referenceImages: referencePreparation,
+        },
       },
     });
 
@@ -485,7 +532,9 @@ export async function POST(request) {
       return ok(
         {
           success: false,
-          error: "Video generation failed. Credits were refunded.",
+          error: error?.code === "VERTICAL_REFERENCE_PREPROCESSING_FAILED"
+            ? error.message
+            : "Video generation failed. Credits were refunded.",
           refundedCredits: reservedVideo.creditsCharged,
         },
         { status: 500 },

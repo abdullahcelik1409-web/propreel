@@ -27,8 +27,22 @@ import {
 import { DEFAULT_AUDIO_BY_VIDEO_STYLE, NO_AUDIO_OPTION, NO_AUDIO_TRACK_ID } from "@/lib/audioConfig";
 
 const formats = [
-  ["16:9", "YouTube / LinkedIn"],
-  ["1:1", "Instagram Square"],
+  {
+    value: "16:9",
+    title: "Horizontal 16:9",
+    description: "Best for YouTube, websites, LinkedIn, and wide property showcases.",
+  },
+  {
+    value: "1:1",
+    title: "Square 1:1",
+    description: "Best for Instagram feed posts and balanced social previews.",
+  },
+  {
+    value: "9:16",
+    title: "Vertical 9:16",
+    description: "Best for TikTok, Instagram Reels, YouTube Shorts and mobile-first property videos.",
+    badge: "Recommended for social media",
+  },
 ];
 
 function formatPriceLabel(price) {
@@ -274,16 +288,19 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
             <div>
               <p className="mb-3 text-sm font-bold text-[var(--pr-muted)]">Aspect ratio</p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {formats.map(([value, label]) => (
+              <div className="grid gap-3 sm:grid-cols-3">
+                {formats.map(({ value, title, description, badge }) => (
                   <button
                     key={value}
                     type="button"
                     onClick={() => setFormat(value)}
                     className={`rounded-lg border p-4 text-left transition ${format === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
                   >
-                    <span className="block text-lg font-black">{value}</span>
-                    <span className="text-sm text-[var(--pr-muted)]">{label}</span>
+                    <span className="flex flex-wrap items-center gap-2 text-lg font-black">
+                      {title}
+                      {badge && <span className="rounded-md border border-[var(--pr-cyan)]/25 bg-[#071010] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-cyan)]">{badge}</span>}
+                    </span>
+                    <span className="mt-2 block text-sm leading-6 text-[var(--pr-muted)]">{description}</span>
                   </button>
                 ))}
               </div>
