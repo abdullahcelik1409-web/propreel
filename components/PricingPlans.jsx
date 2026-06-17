@@ -65,7 +65,7 @@ export default function PricingPlans({ packages, compact = false }) {
     setLoadingPackageId(pack.id);
 
     try {
-      const response = await fetch("/api/payments/lemon-squeezy/checkout", {
+      const response = await fetch("/api/payments/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ packageId: pack.id }),
@@ -78,7 +78,7 @@ export default function PricingPlans({ packages, compact = false }) {
       }
 
       if (!response.ok) {
-        throw new Error(data.error || "Could not start Lemon Squeezy checkout.");
+        throw new Error(data.error || "Could not start payment checkout.");
       }
 
       if (data.checkoutUrl) {
@@ -86,10 +86,10 @@ export default function PricingPlans({ packages, compact = false }) {
         return;
       }
 
-      throw new Error("Lemon Squeezy checkout response is missing checkout details.");
+      throw new Error("Payment checkout response is missing checkout details.");
     } catch (error) {
       setSelectedPackage(pack);
-      setCheckoutError(error?.message || "Could not start Lemon Squeezy checkout.");
+      setCheckoutError(error?.message || "Could not start payment checkout.");
     } finally {
       setLoadingPackageId("");
     }
@@ -161,10 +161,10 @@ export default function PricingPlans({ packages, compact = false }) {
                 disabled={loading}
                 className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <LockIcon /> {loading ? "Opening checkout..." : "Buy Now"}
+                <LockIcon /> {loading ? "Opening checkout..." : pack.checkoutLabel || "Buy Now"}
               </button>
               <p className="mt-2 text-center text-xs font-bold text-[var(--pr-dim)]">
-                Secure checkout by Lemon Squeezy
+                {pack.checkoutProviderLabel || "Secure payment checkout"}
               </p>
             </article>
           );
@@ -177,7 +177,7 @@ export default function PricingPlans({ packages, compact = false }) {
             <p className="pr-kicker">Secure payment</p>
             <h2 className="mt-2 text-xl font-black">{selectedPackage.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">
-              Lemon Squeezy checkout could not be opened automatically. Confirm the Lemon Squeezy environment variables and variant ID for this package, then try again.
+              Payment checkout could not be opened automatically. Confirm the active provider environment variables and package mapping for this package, then try again.
             </p>
             <p className="mt-3 rounded-md border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-3 text-sm font-semibold text-[var(--pr-cyan)]">
               {selectedPackage.credits.toLocaleString("en-US")} credits / {formatUsd(selectedPackage.priceUsd)}

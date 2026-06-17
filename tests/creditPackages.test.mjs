@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-
 import { CREDIT_PACKAGES, premiumVideoConfig } from "../lib/videoConfig.js";
+import { LEMON_SQUEEZY_PRODUCT_ID_ENV_KEYS, LEMON_SQUEEZY_VARIANT_ID_ENV_KEYS, getCreditPackagesWithPaymentConfig } from "../lib/paymentConfig.js";
+import { getPaymentProviderConfig, paymentProviderConfig } from "../lib/payments/providerConfig.js";
 
 test("credit package ids, USD prices, and credit amounts remain configured", () => {
   assert.deepEqual(
@@ -77,12 +77,26 @@ test("Most Popular badge is assigned to the higher Pro package only", () => {
   assert.equal(CREDIT_PACKAGES.find((pack) => pack.id === "premium_credits_50000")?.badge, undefined);
 });
 
-test("Lemon Squeezy env keys follow the configured checkout and webhook mapping", async () => {
-  const paymentConfig = await readFile(new URL("../lib/paymentConfig.js", import.meta.url), "utf8");
+test("Lemon Squeezy env keys follow the configured checkout and webhook mapping", () => {
+  assert.equal(LEMON_SQUEEZY_VARIANT_ID_ENV_KEYS.pro_credits_25000, "LEMON_SQUEEZY_VARIANT_ID_PRO_CREDITS_25000");
+  assert.equal(LEMON_SQUEEZY_VARIANT_ID_ENV_KEYS.premium_credits_50000, "LEMON_SQUEEZY_VARIANT_ID_PREMIUM_CREDITS_50000");
+  assert.equal(LEMON_SQUEEZY_PRODUCT_ID_ENV_KEYS.pro_credits_25000, "LEMON_SQUEEZY_PRODUCT_ID_PRO_CREDITS_25000");
+  assert.equal(LEMON_SQUEEZY_PRODUCT_ID_ENV_KEYS.premium_credits_50000, "LEMON_SQUEEZY_PRODUCT_ID_PREMIUM_CREDITS_50000");
+  assert.equal(LEMON_SQUEEZY_VARIANT_ID_ENV_KEYS.starter_credits, "LEMON_SQUEEZY_VARIANT_ID_STARTER_CREDITS");
+});
 
-  assert.match(paymentConfig, /pro_credits_25000:\s*"LEMON_SQUEEZY_VARIANT_ID_PRO_CREDITS_25000"/);
-  assert.match(paymentConfig, /premium_credits_50000:\s*"LEMON_SQUEEZY_VARIANT_ID_PREMIUM_CREDITS_50000"/);
-  assert.match(paymentConfig, /pro_credits_25000:\s*"LEMON_SQUEEZY_PRODUCT_ID_PRO_CREDITS_25000"/);
-  assert.match(paymentConfig, /premium_credits_50000:\s*"LEMON_SQUEEZY_PRODUCT_ID_PREMIUM_CREDITS_50000"/);
-  assert.match(paymentConfig, /LEMON_SQUEEZY_VARIANT_ID_STARTER_CREDITS/);
+test("payment package config resolves all packages for the active provider without trusting client prices", () => {
+  const packages = getCreditPackagesWithPaymentConfig("paytr");
+  assert.equal(packages.length, 5);
+  assert.deepEqual(
+    packages.map(({ id, priceUsd, currency, credits, active }) => ({ id, priceUsd, currency, credits, active })),
+    CREDIT_PACKAGES.map(({ id, priceUsd, currency, credits }) => ({ id, priceUsd, currency, credits, active: true })),
+  );
+});
+
+test("provider legal model changes payment copy", () => {
+  assert.equal(getPaymentProviderConfig("lemon").legalModel, "merchant_of_record");
+  assert.equal(getPaymentProviderConfig("polar").legalModel, "merchant_of_record");
+  assert.equal(getPaymentProviderConfig("paytr").legalModel, "payment_processor");
+  assert.match(paymentProviderConfig.paytr.pricingPaymentNote, /remains responsible for tax, invoicing, and refund handling/);
 });

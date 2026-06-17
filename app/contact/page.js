@@ -1,4 +1,5 @@
 import MarketingNav from "@/components/MarketingNav";
+import { getActivePaymentProviderConfig } from "@/lib/payments/providerConfig";
 import { PRODUCT_SUMMARY, SELLER_INFO } from "@/lib/siteContent";
 
 export const metadata = {
@@ -10,6 +11,8 @@ const phoneHref = `tel:${SELLER_INFO.phone.replace(/\s/g, "")}`;
 const mailHref = `mailto:${SELLER_INFO.email}?subject=Viseo%20support`;
 
 export default function ContactPage() {
+  const providerConfig = getActivePaymentProviderConfig();
+
   return (
     <main className="pr-shell min-h-screen">
       <MarketingNav />
@@ -69,7 +72,8 @@ export default function ContactPage() {
 
           <div className="mt-6 rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-4 text-sm leading-7 text-[var(--pr-muted)]">
             <p className="font-bold text-white">Support topics</p>
-            <p className="mt-2">Digital credit delivery, refund requests, failed video generation, account access, and Lemon Squeezy checkout questions.</p>
+            <p className="mt-2">Digital credit delivery, refund requests, failed video generation, account access, and {providerConfig.displayName} checkout questions.</p>
+            <p className="mt-2">{providerConfig.customerSupportText}</p>
           </div>
         </div>
       </section>

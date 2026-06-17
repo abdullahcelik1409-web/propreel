@@ -1,4 +1,5 @@
 import AdminDashboardTabs from "@/components/AdminDashboardTabs";
+import { getActivePaymentProvider } from "@/lib/payments/providerConfig";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -11,6 +12,7 @@ export default async function AdminPage() {
     if (error.status === 403) redirect("/dashboard");
     throw error;
   });
+  const activePaymentProvider = getActivePaymentProvider();
 
   const [users, totalVideos, creditAggregate, recentPayments] = await Promise.all([
     prisma.user.findMany({
@@ -20,12 +22,13 @@ export default async function AdminPage() {
     prisma.video.count(),
     prisma.user.aggregate({ _sum: { credits: true } }),
     prisma.paymentOrder.findMany({
-      where: { provider: "lemon_squeezy" },
+      where: { provider: activePaymentProvider },
       orderBy: { createdAt: "desc" },
       take: 20,
       select: {
         id: true,
         providerOrderId: true,
+        provider: true,
         providerCustomerId: true,
         buyerEmail: true,
         packageName: true,
@@ -34,6 +37,8 @@ export default async function AdminPage() {
         amount: true,
         currency: true,
         status: true,
+        providerEventId: true,
+        eventType: true,
         createdAt: true,
       },
     }),
@@ -64,6 +69,7 @@ export default async function AdminPage() {
             ...payment,
             createdAt: payment.createdAt.toISOString(),
           }))}
+          activePaymentProvider={activePaymentProvider}
         />
       </div>
     </main>

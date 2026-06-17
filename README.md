@@ -402,11 +402,11 @@ Every image you upload is saved locally (URL + thumbnail) so you never upload th
 
 ## 🚀 Quick Start
 
-### Lemon Squeezy
+### Payment Providers
 
-Web ödeme altyapısı Lemon Squeezy ile çalışır. Kredi paketleri tek seferlik USD satış olarak yapılandırılır ve kredi yükleme sadece doğrulanmış Lemon Squeezy webhook ile yapılır.
+Web payment runs through `PAYMENT_PROVIDER=lemon|polar|paytr`. The client sends only `packageId`; price, credits, currency, and provider product/price mapping are resolved on the server.
 
-Kurulum, env değişkenleri, Lemon Squeezy store/product/variant tablosu ve başvuru checklist'i için [docs/LEMON_SQUEEZY_SETUP.md](docs/LEMON_SQUEEZY_SETUP.md) dosyasını kullanın.
+Credits are granted only after a verified provider webhook. See [docs/LEMON_SQUEEZY_SETUP.md](docs/LEMON_SQUEEZY_SETUP.md) for the adapter, env, webhook, legal copy, and production checklist.
 
 ### Prerequisites
 

@@ -3,6 +3,7 @@ import PricingPlans from "@/components/PricingPlans";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
 import { getCreditPackagesWithPaymentConfig } from "@/lib/paymentConfig";
+import { getActivePaymentProviderConfig } from "@/lib/payments/providerConfig";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -12,10 +13,13 @@ export default async function CreditsPage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/login");
 
+  const providerConfig = getActivePaymentProviderConfig();
   const events = await prisma.creditEvent.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 50 });
   const packages = getCreditPackagesWithPaymentConfig().map((pack) => ({
     ...pack,
-    features: ["Secure Lemon Squeezy Checkout", "Webhook-confirmed digital credit delivery", "No subscription"],
+    checkoutLabel: providerConfig.checkoutLabel,
+    checkoutProviderLabel: providerConfig.checkoutProviderLabel,
+    features: [`Secure ${providerConfig.displayName} checkout`, "Webhook-confirmed digital credit delivery", "No subscription"],
   }));
 
   return (
@@ -25,7 +29,7 @@ export default async function CreditsPage() {
         <div className="mt-3"><CreditBadge credits={user.credits} /></div>
       </div>
       <div className="flex flex-col gap-3 rounded-lg border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)] md:flex-row md:items-center md:justify-between">
-        <span>Buy digital credits through secure Lemon Squeezy Checkout.</span>
+        <span>Buy digital credits through secure {providerConfig.displayName} checkout.</span>
         <Link href="/pricing" className="pr-primary px-4 py-2 text-center text-sm">
           View Pricing
         </Link>

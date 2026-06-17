@@ -4,5 +4,5 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request) {
-  return handlePaymentWebhook(request, "lemon");
+  return handlePaymentWebhook(request, "polar");
 }

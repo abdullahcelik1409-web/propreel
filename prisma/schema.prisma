@@ -102,8 +102,8 @@ model CreditEvent {
 
 model PaymentOrder {
   id              String   @id @default(cuid())
-  provider        String   @default("lemon_squeezy")
-  providerOrderId String   @unique
+  provider        String   @default("lemon")
+  providerOrderId String
   providerEventId String?
   eventType       String?
   status          String   @default("received")
@@ -130,9 +130,26 @@ model PaymentOrder {
   @@index([userId, createdAt])
   @@index([status])
   @@index([packageId])
-  @@index([provider, providerOrderId])
+  @@unique([provider, providerOrderId])
   @@index([providerPriceId])
   @@index([internalOrderId])
+}
+
+model PaymentWebhookEvent {
+  id               String    @id @default(cuid())
+  provider         String
+  eventId          String
+  eventType        String
+  processingStatus String    @default("received")
+  rawPayload       Json
+  errorMessage     String?
+  processedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([provider, eventId])
+  @@index([provider, processingStatus])
+  @@index([createdAt])
 }
 
 model LemonSqueezyWebhookEvent {

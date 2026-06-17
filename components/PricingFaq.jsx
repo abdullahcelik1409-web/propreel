@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-const faqs = [
+function buildFaqs({ providerDisplayName = "the active payment provider", paymentSecurityText = "Viseo never stores your card details." } = {}) {
+  return [
   [
     "What is a credit?",
     "Each credit is a unit used to generate one video segment. Basic videos use 120 credits, multi-image videos use 160 credits (10s) or 480 credits (30s).",
@@ -14,16 +15,18 @@ const faqs = [
   ],
   [
     "Which payment methods are accepted?",
-    "Payments are priced in USD and processed through Lemon Squeezy Checkout. Available methods can include cards, Apple Pay, Google Pay, and PayPal depending on buyer location.",
+    `Payments are priced in USD and processed through ${providerDisplayName} checkout. Available methods depend on provider settings and buyer location.`,
   ],
   [
     "Is my payment information secure?",
-    "Yes. Payments are handled by Lemon Squeezy as merchant of record. Viseo never stores your card details.",
+    `Yes. ${paymentSecurityText} Viseo never stores your card details.`,
   ],
-];
+  ];
+}
 
-export default function PricingFaq() {
+export default function PricingFaq({ providerDisplayName, paymentSecurityText }) {
   const [openIndex, setOpenIndex] = useState(0);
+  const faqs = buildFaqs({ providerDisplayName, paymentSecurityText });
 
   return (
     <section className="mt-10">

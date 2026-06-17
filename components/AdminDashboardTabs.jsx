@@ -14,7 +14,7 @@ function formatPaymentAmount(payment) {
   return `${payment.amount} ${payment.currency || "USD"}`;
 }
 
-export default function AdminDashboardTabs({ users = [], totalVideos = 0, creditsInCirculation = 0, recentPayments = [] }) {
+export default function AdminDashboardTabs({ users = [], totalVideos = 0, creditsInCirculation = 0, recentPayments = [], activePaymentProvider = "lemon" }) {
   const [activeTab, setActiveTab] = useState("management");
 
   return (
@@ -97,12 +97,13 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
 
           <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
             <div className="border-b border-[var(--pr-border-soft)] bg-[#071010] p-4">
-              <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">Recent Lemon Squeezy Payments</p>
+              <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">Recent {activePaymentProvider} Payments</p>
             </div>
             <table className="w-full text-left text-sm">
               <thead className="bg-[#071010] text-[var(--pr-muted)]">
                 <tr>
                   <th className="p-3">Transaction</th>
+                  <th className="p-3">Provider</th>
                   <th className="p-3">Customer</th>
                   <th className="p-3">Package</th>
                   <th className="p-3">Credits</th>
@@ -115,6 +116,7 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
                 {recentPayments.map((payment) => (
                   <tr key={payment.id} className="border-t border-[var(--pr-border-soft)]">
                     <td className="max-w-48 truncate p-3 font-mono text-xs text-[var(--pr-muted)]">{payment.providerOrderId}</td>
+                    <td className="p-3 text-[var(--pr-muted)]">{payment.provider || "-"}</td>
                     <td className="p-3">{payment.buyerEmail || payment.providerCustomerId || "-"}</td>
                     <td className="p-3 text-[var(--pr-muted)]">{payment.packageName || payment.packageId || "-"}</td>
                     <td className="p-3 font-semibold text-[var(--pr-cyan)]">{payment.credits}</td>
@@ -125,8 +127,8 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
                 ))}
                 {!recentPayments.length && (
                   <tr>
-                    <td className="p-6 text-center text-[var(--pr-muted)]" colSpan={7}>
-                      No Lemon Squeezy payments yet.
+                    <td className="p-6 text-center text-[var(--pr-muted)]" colSpan={8}>
+                      No {activePaymentProvider} payments yet.
                     </td>
                   </tr>
                 )}

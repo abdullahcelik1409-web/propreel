@@ -1,41 +1,38 @@
-# Lemon Squeezy Setup Guide
+# Payment Provider Setup Guide
 
-This project sells one-time digital credit packages for AI real estate video generation. Lemon Squeezy is the merchant of record for checkout, payment processing, tax handling, receipts, and supported payment methods.
+Viseo sells one-time digital credit packages for AI real estate video generation. The active payment provider is selected with `PAYMENT_PROVIDER=lemon|polar|paytr`.
+
+## Architecture
+
+- `lib/payments/providerConfig.js` defines provider legal model and UI/legal copy.
+- `lib/payments/packageConfig.js` maps the existing five credit packages to USD prices and provider product/price IDs.
+- `lib/payments/paymentService.js` owns checkout creation, webhook processing, idempotency, payment records, and credit fulfillment.
+- Provider adapters live in `lib/payments/providers/`.
+- Checkout route: `/api/payments/checkout`.
+- Central webhook route: `/api/webhooks/payment?provider=<provider>`.
+- Provider-specific webhook routes: `/api/webhooks/lemon-squeezy`, `/api/webhooks/polar`, `/api/webhooks/paytr`.
 
 ## Package Mapping
 
-| Package | Internal ID | Price | Currency | Credits | Lemon Squeezy Product ID env | Lemon Squeezy Variant ID env |
-|---|---|---:|---|---:|---|---|
-| Starter Credits | `starter_credits` | 9 | USD | 1,200 | `LEMON_SQUEEZY_PRODUCT_ID_STARTER_CREDITS` | `LEMON_SQUEEZY_VARIANT_ID_STARTER_CREDITS` |
-| Growth Credits | `growth_credits` | 19 | USD | 3,000 | `LEMON_SQUEEZY_PRODUCT_ID_GROWTH_CREDITS` | `LEMON_SQUEEZY_VARIANT_ID_GROWTH_CREDITS` |
-| Agency Credits | `agency_credits` | 49 | USD | 9,000 | `LEMON_SQUEEZY_PRODUCT_ID_AGENCY_CREDITS` | `LEMON_SQUEEZY_VARIANT_ID_AGENCY_CREDITS` |
-| Pro Credits | `pro_credits_25000` | 149 | USD | 25,000 | `LEMON_SQUEEZY_PRODUCT_ID_PRO_CREDITS_25000` | `LEMON_SQUEEZY_VARIANT_ID_PRO_CREDITS_25000` |
-| Premium Credits | `premium_credits_50000` | 299 | USD | 50,000 | `LEMON_SQUEEZY_PRODUCT_ID_PREMIUM_CREDITS_50000` | `LEMON_SQUEEZY_VARIANT_ID_PREMIUM_CREDITS_50000` |
+| Package | Internal ID | Price | Currency | Credits |
+|---|---|---:|---|---:|
+| Starter Credits | `starter_credits` | 9 | USD | 1,200 |
+| Growth Credits | `growth_credits` | 19 | USD | 3,000 |
+| Agency Credits | `agency_credits` | 49 | USD | 9,000 |
+| Pro Credits | `pro_credits_25000` | 149 | USD | 25,000 |
+| Premium Credits | `premium_credits_50000` | 299 | USD | 50,000 |
 
-Variant ID is the server-side fulfillment key. Credits are granted only when the signed Lemon Squeezy `order_created` webhook matches the expected package custom data and variant ID.
-
-## Lemon Squeezy Dashboard Steps
-
-1. Activate the Lemon Squeezy store and complete identity/store review.
-2. Create one product or separate products for the credit packages.
-3. Create one single-payment variant per credit package.
-4. Set prices in USD: `9`, `19`, `49`, `149`, `299`.
-5. Copy the store ID to `LEMON_SQUEEZY_STORE_ID`.
-6. Create an API key and set `LEMON_SQUEEZY_API_KEY`.
-7. Create a webhook in Settings > Webhooks:
-   - URL: `https://your-domain.com/api/webhooks/lemon-squeezy`
-   - Events: `order_created`, `order_refunded`
-   - Signing secret: set the same value in `LEMON_SQUEEZY_WEBHOOK_SECRET`
-8. Remove all legacy payment provider environment variables from local, preview, and production environments.
+The client sends only `packageId`. Price, currency, credits, and provider product/price IDs are resolved on the server.
 
 ## Environment Variables
 
 ```bash
+PAYMENT_PROVIDER=lemon
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+
 LEMON_SQUEEZY_API_KEY=
 LEMON_SQUEEZY_STORE_ID=
 LEMON_SQUEEZY_WEBHOOK_SECRET=
-NEXT_PUBLIC_APP_URL=https://your-domain.com
-
 LEMON_SQUEEZY_PRODUCT_ID_STARTER_CREDITS=
 LEMON_SQUEEZY_VARIANT_ID_STARTER_CREDITS=
 LEMON_SQUEEZY_PRODUCT_ID_GROWTH_CREDITS=
@@ -46,33 +43,81 @@ LEMON_SQUEEZY_PRODUCT_ID_PRO_CREDITS_25000=
 LEMON_SQUEEZY_VARIANT_ID_PRO_CREDITS_25000=
 LEMON_SQUEEZY_PRODUCT_ID_PREMIUM_CREDITS_50000=
 LEMON_SQUEEZY_VARIANT_ID_PREMIUM_CREDITS_50000=
+
+POLAR_ACCESS_TOKEN=
+POLAR_WEBHOOK_SECRET=
+POLAR_ORGANIZATION_ID=
+POLAR_PRODUCT_ID_STARTER_CREDITS=
+POLAR_PRICE_ID_STARTER_CREDITS=
+POLAR_PRODUCT_ID_GROWTH_CREDITS=
+POLAR_PRICE_ID_GROWTH_CREDITS=
+POLAR_PRODUCT_ID_AGENCY_CREDITS=
+POLAR_PRICE_ID_AGENCY_CREDITS=
+POLAR_PRODUCT_ID_PRO_CREDITS_25000=
+POLAR_PRICE_ID_PRO_CREDITS_25000=
+POLAR_PRODUCT_ID_PREMIUM_CREDITS_50000=
+POLAR_PRICE_ID_PREMIUM_CREDITS_50000=
+
+PAYTR_MERCHANT_ID=
+PAYTR_MERCHANT_KEY=
+PAYTR_MERCHANT_SALT=
+PAYTR_TEST_MODE=0
 ```
 
-`LEMON_SQUEEZY_API_KEY` and `LEMON_SQUEEZY_WEBHOOK_SECRET` must remain server-side only.
+Only `NEXT_PUBLIC_*` values may be exposed to the frontend. Provider API keys and webhook secrets must stay server-side.
 
-## Flow
+## Provider Notes
 
-1. The user selects a credit package from pricing or credits.
-2. The client sends only `packageId`.
-3. `/api/payments/lemon-squeezy/checkout` validates the authenticated user.
-4. The server resolves package price, credits, product ID, and variant ID.
-5. The server creates a Lemon Squeezy checkout and passes custom data: `user_id`, `user_email`, `package_id`, `credits`, `internal_order_id`, `price_usd`, `currency`, `billing_type`.
-6. The user is redirected to Lemon Squeezy hosted checkout.
-7. Credits are delivered only from `/api/webhooks/lemon-squeezy` after a valid `X-Signature` and `order_created` event.
-8. Duplicate webhook or duplicate order delivery is blocked by `LemonSqueezyWebhookEvent.eventId` and `PaymentOrder.creditedAt`.
+Lemon Squeezy:
+- Legal model: Merchant of Record.
+- Configure one-time variants for each package.
+- Webhook events: `order_created`, `order_refunded`.
+- Signature header: `X-Signature`.
 
-## Application Checklist
+Polar:
+- Legal model: Merchant of Record.
+- Configure products/prices for each package.
+- Keep Viseo credit delivery in `User.credits` + `CreditEvent`; do not grant credits twice through Polar benefits and Viseo ledger.
 
-- [ ] Public pricing page is available.
-- [ ] Public terms page is available.
-- [ ] Public privacy page is available.
-- [ ] Public refund policy is available.
-- [ ] Contact/support page shows seller email, phone, and address.
-- [ ] The website clearly describes digital credits and AI real estate video generation.
-- [ ] Prices are shown before checkout in USD.
-- [ ] The refund policy explains unused credits and used digital service credits.
-- [ ] Legacy payment provider names are not visible in active UI, legal pages, env examples, or docs.
-- [ ] Lemon Squeezy product and variant IDs are configured in production env.
-- [ ] Webhook URL is configured for `order_created` and `order_refunded`.
-- [ ] A test purchase grants credits once.
-- [ ] A duplicate webhook does not grant credits twice.
+PayTR:
+- Legal model: payment processor.
+- Viseo remains responsible for seller, tax, invoice, and refund obligations.
+- Configure merchant credentials and callback URL.
+
+## Fulfillment Flow
+
+1. User selects a credit package.
+2. Client posts `{ packageId }` to `/api/payments/checkout`.
+3. Server authenticates the user and resolves package config.
+4. Active adapter creates checkout.
+5. Server stores a `PaymentOrder` with `checkout_created`.
+6. Provider sends a signed webhook.
+7. `paymentService` verifies signature before parsing fulfillment data.
+8. `PaymentWebhookEvent(provider,eventId)` blocks duplicate events.
+9. `PaymentOrder(provider,providerOrderId)` and `PaymentOrder.creditedAt` block duplicate credit grants.
+10. Successful paid events increment `User.credits` and create a `CreditEvent`.
+
+## Legal Copy
+
+Legal, pricing, footer, refund, and privacy text comes from `paymentProviderConfig`.
+
+- Lemon and Polar use `merchant_of_record` copy.
+- PayTR uses `payment_processor` copy and does not show Merchant of Record language.
+
+## Production Checklist
+
+- [ ] Supabase tables checked; duplicate payment/credit tables were not created.
+- [ ] `PaymentOrder` uses provider-scoped idempotency.
+- [ ] `PaymentWebhookEvent` exists with unique `(provider,eventId)`.
+- [ ] `CreditEvent` and `User.credits` are the active credit ledger/balance model.
+- [ ] RLS is enabled for payment/webhook/credit tables.
+- [ ] `PAYMENT_PROVIDER` is correct.
+- [ ] Active provider env values are configured.
+- [ ] Package prices are USD: `9`, `19`, `49`, `149`, `299`.
+- [ ] Provider product/price IDs match the active dashboard.
+- [ ] Checkout tested.
+- [ ] Webhook signature tested.
+- [ ] Duplicate webhook tested.
+- [ ] Credit delivery tested.
+- [ ] Terms, Privacy, Refund Policy, Contact, Pricing, and Footer reviewed for the active provider.
+- [ ] Build/tests pass.
