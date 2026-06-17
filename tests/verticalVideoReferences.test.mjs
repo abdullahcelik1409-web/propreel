@@ -42,22 +42,22 @@ test("vertical format returns processed URLs in the original order", async () =>
     uploadImage: async ({ imageBuffer, index }) => {
       calls.push({ index, body: imageBuffer.toString() });
       return {
-        url: `https://cdn.example.com/processed-${index}.webp`,
-        storagePath: `processed-video-references/vertical/user_1/job_1/${index}.webp`,
+        url: `https://cdn.example.com/processed-${index}.jpg`,
+        storagePath: `processed-video-references/vertical/user_1/job_1/${index}.jpg`,
       };
     },
   });
 
   assert.equal(result.processed, true);
   assert.deepEqual(result.imageUrls, [
-    "https://cdn.example.com/processed-0.webp",
-    "https://cdn.example.com/processed-1.webp",
+    "https://cdn.example.com/processed-0.jpg",
+    "https://cdn.example.com/processed-1.jpg",
   ]);
   assert.deepEqual(calls.map((call) => call.index), [0, 1]);
   assert.match(calls[0].body, /vertical:https:\/\/cdn\.example\.com\/a\.jpg/);
 });
 
-test("transformImageToVerticalCanvas creates a 1080x1920 WebP", async () => {
+test("transformImageToVerticalCanvas creates a 1080x1920 JPEG", async () => {
   const input = await sharp({
     create: {
       width: 1200,
@@ -72,7 +72,7 @@ test("transformImageToVerticalCanvas creates a 1080x1920 WebP", async () => {
 
   assert.equal(metadata.width, 1080);
   assert.equal(metadata.height, 1920);
-  assert.equal(metadata.format, "webp");
+  assert.equal(metadata.format, "jpeg");
 });
 
 test("Kling 3 premium payload carries processed images and vertical aspect ratio", () => {

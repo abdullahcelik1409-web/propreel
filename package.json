@@ -123,6 +123,7 @@
     "ai-agent": "file:./packages/Open-Poe-AI/packages/agents",
     "axios": "^1.7.0",
     "bcryptjs": "^3.0.3",
+    "jimp": "^1.6.1",
     "next": "^15.0.0",
     "next-auth": "^4.24.14",
     "react": "^19.0.0",
