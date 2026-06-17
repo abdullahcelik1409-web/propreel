@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import VideoStatusPoller from "./VideoStatusPoller";
 import { getAudioMetadata, getPlayableVideoUrl } from "@/lib/audioConfig";
+import { formatStableDate } from "@/lib/dateFormatting";
 import { VIDEO_STYLE_TEMPLATES } from "@/lib/videoConfig";
 
 function StatusBadge({ status }) {
@@ -91,7 +92,7 @@ export default function VideoCard({ video }) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="line-clamp-1 font-semibold text-[var(--pr-text)]">{listingTitle}</h3>
-            <p className="mt-1 text-xs text-[var(--pr-dim)]">{new Date(current.createdAt).toLocaleDateString()}</p>
+            <p className="mt-1 text-xs text-[var(--pr-dim)]">{formatStableDate(current.createdAt)}</p>
           </div>
           <StatusBadge status={current.status} />
         </div>

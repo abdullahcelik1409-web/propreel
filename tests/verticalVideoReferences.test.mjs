@@ -75,6 +75,24 @@ test("transformImageToVerticalCanvas creates a 1080x1920 JPEG", async () => {
   assert.equal(metadata.format, "jpeg");
 });
 
+test("transformImageToVerticalCanvas accepts WebP input", async () => {
+  const input = await sharp({
+    create: {
+      width: 900,
+      height: 1400,
+      channels: 3,
+      background: "#7dc4d2",
+    },
+  }).webp().toBuffer();
+
+  const output = await transformImageToVerticalCanvas(input);
+  const metadata = await sharp(output).metadata();
+
+  assert.equal(metadata.width, 1080);
+  assert.equal(metadata.height, 1920);
+  assert.equal(metadata.format, "jpeg");
+});
+
 test("Kling 3 premium payload carries processed images and vertical aspect ratio", () => {
   const input = buildPremiumProviderInput({
     scene: {

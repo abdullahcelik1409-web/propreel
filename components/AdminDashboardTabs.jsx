@@ -3,10 +3,10 @@
 import { useState } from "react";
 import AdminCreditsForm from "@/components/AdminCreditsForm";
 import AdminFalCostsPanel from "@/components/AdminFalCostsPanel";
+import { formatStableDate } from "@/lib/dateFormatting";
 
 function formatJoinDate(value) {
-  if (!value) return "-";
-  return new Date(value).toLocaleDateString();
+  return formatStableDate(value);
 }
 
 function formatPaymentAmount(payment) {
