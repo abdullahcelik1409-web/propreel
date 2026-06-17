@@ -13,6 +13,9 @@ const createNextConfig = (phase) => {
     transpilePackages: ['studio', 'ai-agent', 'workflow-builder', 'design-agent'],
     serverExternalPackages: ['sharp'],
     outputFileTracingRoot: __dirname,
+    outputFileTracingIncludes: {
+      '/api/videos/**/*': ['./node_modules/@ffmpeg-installer/**/*'],
+    },
     distDir: isDev || isVercel ? '.next' : '.next-build',
   };
 };
