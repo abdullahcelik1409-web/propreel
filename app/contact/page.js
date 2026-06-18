@@ -1,4 +1,3 @@
-import ContactSupportForm from "@/components/ContactSupportForm";
 import MarketingNav from "@/components/MarketingNav";
 import { getActivePaymentProviderConfig } from "@/lib/payments/providerConfig";
 import { PRODUCT_SUMMARY, SELLER_INFO } from "@/lib/siteContent";
@@ -7,6 +6,8 @@ export const metadata = {
   title: "Contact - Viseo",
   description: "Contact Viseo seller support for digital real estate video credits.",
 };
+
+const mailHref = `mailto:${SELLER_INFO.email}?subject=Viseo%20support`;
 
 export default function ContactPage() {
   const providerConfig = getActivePaymentProviderConfig();
@@ -50,11 +51,16 @@ export default function ContactPage() {
 
         <div className="pr-section p-5">
           <p className="pr-kicker">Support</p>
-          <h2 className="mt-2 text-2xl font-black">Send a support message</h2>
+          <h2 className="mt-2 text-2xl font-black">Use direct contact channels</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--pr-muted)]">
-            Send payment, credit delivery, refund, or account questions directly to Viseo support.
+            For the fastest response, contact support by email. Include your account email, credit package, and a short description of the issue.
           </p>
-          <ContactSupportForm supportEmail={SELLER_INFO.email} />
+
+          <div className="mt-6 grid gap-3">
+            <a href={mailHref} className="pr-primary inline-flex justify-center px-5 py-3 text-sm">
+              Email Viseo Support
+            </a>
+          </div>
 
           <div className="mt-6 rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-4 text-sm leading-7 text-[var(--pr-muted)]">
             <p className="font-bold text-white">Support topics</p>
