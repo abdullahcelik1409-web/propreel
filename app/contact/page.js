@@ -7,7 +7,6 @@ export const metadata = {
   description: "Contact Viseo seller support for digital real estate video credits.",
 };
 
-const phoneHref = `tel:${SELLER_INFO.phone.replace(/\s/g, "")}`;
 const mailHref = `mailto:${SELLER_INFO.email}?subject=Viseo%20support`;
 
 export default function ContactPage() {
@@ -38,10 +37,6 @@ export default function ContactPage() {
                 <dd className="mt-1 text-[var(--pr-muted)]">{SELLER_INFO.address}</dd>
               </div>
               <div>
-                <dt className="font-bold text-white">Phone</dt>
-                <dd className="mt-1 text-[var(--pr-muted)]">{SELLER_INFO.phone}</dd>
-              </div>
-              <div>
                 <dt className="font-bold text-white">Email</dt>
                 <dd className="mt-1 text-[var(--pr-muted)]">{SELLER_INFO.email}</dd>
               </div>
@@ -58,15 +53,12 @@ export default function ContactPage() {
           <p className="pr-kicker">Support</p>
           <h2 className="mt-2 text-2xl font-black">Use direct contact channels</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--pr-muted)]">
-            For the fastest response, contact the seller directly by email or phone. Include your account email, credit package, and a short description of the issue.
+            For the fastest response, contact support by email. Include your account email, credit package, and a short description of the issue.
           </p>
 
           <div className="mt-6 grid gap-3">
             <a href={mailHref} className="pr-primary inline-flex justify-center px-5 py-3 text-sm">
               Email Viseo Support
-            </a>
-            <a href={phoneHref} className="pr-secondary inline-flex justify-center px-5 py-3 text-sm font-semibold">
-              Call Seller
             </a>
           </div>
 
