@@ -102,7 +102,7 @@ model CreditEvent {
 
 model PaymentOrder {
   id              String   @id @default(cuid())
-  provider        String   @default("lemon")
+  provider        String   @default("polar")
   providerOrderId String
   providerEventId String?
   eventType       String?

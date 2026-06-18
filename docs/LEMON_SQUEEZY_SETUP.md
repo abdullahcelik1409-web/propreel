@@ -1,6 +1,8 @@
 # Payment Provider Setup Guide
 
-Viseo sells one-time digital credit packages for AI real estate video generation. The active payment provider is selected with `PAYMENT_PROVIDER=lemon|polar|paytr`.
+Viseo sells one-time digital credit packages for AI real estate video generation. The active payment provider is `PAYMENT_PROVIDER=polar`; `lemon` and `paytr` remain fallback adapters.
+
+For the current Polar rollout, use [POLAR_SETUP.md](POLAR_SETUP.md). This file remains as a generic multi-provider architecture note.
 
 ## Architecture
 
@@ -27,7 +29,7 @@ The client sends only `packageId`. Price, currency, credits, and provider produc
 ## Environment Variables
 
 ```bash
-PAYMENT_PROVIDER=lemon
+PAYMENT_PROVIDER=polar
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 
 LEMON_SQUEEZY_API_KEY=
@@ -47,6 +49,12 @@ LEMON_SQUEEZY_VARIANT_ID_PREMIUM_CREDITS_50000=
 POLAR_ACCESS_TOKEN=
 POLAR_WEBHOOK_SECRET=
 POLAR_ORGANIZATION_ID=
+POLAR_ENVIRONMENT=sandbox
+POLAR_PRODUCT_ID_PACKAGE_1=
+POLAR_PRODUCT_ID_PACKAGE_2=
+POLAR_PRODUCT_ID_PACKAGE_3=
+POLAR_PRODUCT_ID_PACKAGE_4=
+POLAR_PRODUCT_ID_PACKAGE_5=
 POLAR_PRODUCT_ID_STARTER_CREDITS=
 POLAR_PRICE_ID_STARTER_CREDITS=
 POLAR_PRODUCT_ID_GROWTH_CREDITS=

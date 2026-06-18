@@ -404,9 +404,9 @@ Every image you upload is saved locally (URL + thumbnail) so you never upload th
 
 ### Payment Providers
 
-Web payment runs through `PAYMENT_PROVIDER=lemon|polar|paytr`. The client sends only `packageId`; price, credits, currency, and provider product/price mapping are resolved on the server.
+Web payment now defaults to `PAYMENT_PROVIDER=polar`; `lemon` and `paytr` remain adapter fallbacks. The client sends only `packageId`; price, credits, currency, and provider product mapping are resolved on the server.
 
-Credits are granted only after a verified provider webhook. See [docs/LEMON_SQUEEZY_SETUP.md](docs/LEMON_SQUEEZY_SETUP.md) for the adapter, env, webhook, legal copy, and production checklist.
+Polar Checkout Session uses the five existing USD credit packages: `9`, `19`, `49`, `149`, and `299`. Credits are granted in Supabase only after a verified Polar `order.paid` webhook. See [docs/POLAR_SETUP.md](docs/POLAR_SETUP.md) for sandbox/prod setup, product mapping, webhook signing, Merchant of Record notes, and the production checklist.
 
 ### Prerequisites
 
