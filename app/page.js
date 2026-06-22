@@ -86,15 +86,15 @@ export default function LandingPage() {
     <main className="pr-shell min-h-screen overflow-hidden">
       <MarketingNav />
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 pb-16 pt-10 lg:grid-cols-[1.02fr_.98fr] lg:pb-24 lg:pt-16">
-        <div className="flex flex-col justify-center">
+      <section className="mx-0 grid max-w-[390px] gap-10 px-4 pb-16 pt-10 sm:mx-auto sm:max-w-7xl sm:px-6 lg:grid-cols-[1.02fr_.98fr] lg:pb-24 lg:pt-16">
+        <div className="flex min-w-0 flex-col justify-center">
           <div className="mb-5 inline-flex w-fit rounded-full border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-4 py-2 text-xs font-bold text-[var(--pr-cyan)]">
             {PRODUCTION_DEFAULT_USER_CREDITS} free credits with every new account
           </div>
-          <h1 className="max-w-4xl text-4xl font-black leading-[1.02] tracking-tight md:text-6xl">
+          <h1 className="max-w-[22rem] break-words text-3xl font-black leading-[1.04] tracking-tight sm:max-w-4xl sm:text-4xl md:text-6xl">
             Property video production for modern real estate agents
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--pr-muted)]">
+          <p className="mt-6 max-w-[22rem] text-base leading-7 text-[var(--pr-muted)] sm:max-w-2xl sm:text-lg sm:leading-8">
             Viseo turns listing photos, price, location, and property features into clean marketing videos for agents who need repeatable campaign output.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -121,7 +121,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="pr-section p-4 shadow-2xl">
+        <div className="pr-section min-w-0 p-4 shadow-2xl">
           <div className="relative overflow-hidden rounded-xl border border-[var(--pr-border-soft)] bg-[#071010]">
             <div className="relative aspect-[16/11] bg-[linear-gradient(135deg,#e4eee9_0%,#b9d7cf_22%,#405c56_44%,#10201f_72%,#071010_100%)]">
               <div className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-xs font-black text-white backdrop-blur">
@@ -164,7 +164,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="mx-auto max-w-7xl px-6 pb-20">
+      <section id="how-it-works" className="mx-0 max-w-[390px] px-4 pb-20 sm:mx-auto sm:max-w-7xl sm:px-6">
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="pr-kicker">How it works</p>

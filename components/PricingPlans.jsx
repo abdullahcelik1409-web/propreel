@@ -97,7 +97,7 @@ export default function PricingPlans({ packages, compact = false }) {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {packages.map((pack) => {
           const premium = pack.id === "pro_credits_25000" || pack.id === "premium_credits_50000";
           const flagship = pack.id === "premium_credits_50000";
@@ -108,7 +108,7 @@ export default function PricingPlans({ packages, compact = false }) {
           return (
             <article
               key={pack.id}
-              className={`relative flex min-h-[360px] flex-col overflow-hidden rounded-2xl border p-5 transition hover:-translate-y-1 ${
+              className={`relative flex min-h-[360px] min-w-0 flex-col overflow-hidden rounded-2xl border p-5 transition hover:-translate-y-1 ${
                 flagship
                   ? "border-[var(--pr-gold)] bg-[linear-gradient(180deg,rgba(233,193,118,0.16),rgba(7,16,16,0.92))] shadow-[0_0_34px_rgba(255,209,102,0.14)]"
                   : premium
@@ -147,11 +147,11 @@ export default function PricingPlans({ packages, compact = false }) {
               <p className="mt-2 text-lg font-bold text-[var(--pr-cyan)]">{pack.credits.toLocaleString("en-US")} credits</p>
               <p className="mt-3 min-h-12 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
               {!compact && (
-                <ul className="mt-5 flex-1 space-y-3 text-sm text-[var(--pr-muted)]">
+                <ul className="mt-5 min-w-0 flex-1 space-y-3 text-sm text-[var(--pr-muted)]">
                   {pack.features.map((feature) => (
-                    <li key={feature} className="flex gap-2">
-                      <span className={`mt-1 h-2 w-2 rounded-full ${premium ? "bg-[var(--pr-gold)]" : "bg-[var(--pr-cyan)]"}`} />
-                      <span>{feature}</span>
+                    <li key={feature} className="flex min-w-0 gap-2">
+                      <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${premium ? "bg-[var(--pr-gold)]" : "bg-[var(--pr-cyan)]"}`} />
+                      <span className="min-w-0 break-words">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -160,7 +160,7 @@ export default function PricingPlans({ packages, compact = false }) {
                 type="button"
                 onClick={() => startCheckout(pack)}
                 disabled={loading}
-                className={`mt-6 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-center text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-70 ${
                   premium ? "border border-[var(--pr-gold)]/45 bg-[var(--pr-gold)] text-[#221700] hover:bg-[#ffe2a2]" : "pr-primary"
                 }`}
               >

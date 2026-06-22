@@ -50,12 +50,12 @@ export default function PricingPage() {
   return (
     <main className="pr-shell min-h-screen">
       <MarketingNav />
-      <section className="mx-auto max-w-7xl px-6 py-14">
+      <section className="mx-0 max-w-[390px] px-4 py-14 sm:mx-auto sm:max-w-7xl sm:px-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
-          <div className="max-w-3xl">
+          <div className="min-w-0 max-w-3xl">
             <p className="pr-kicker">Pricing</p>
-            <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent USD credit packages</h1>
-            <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
+            <h1 className="mt-3 max-w-[22rem] break-words text-3xl font-black tracking-tight sm:max-w-3xl sm:text-4xl md:text-5xl">Transparent USD credit packages</h1>
+            <p className="mt-5 max-w-[22rem] text-base leading-7 text-[var(--pr-muted)] sm:max-w-3xl sm:text-lg sm:leading-8">
               Buy one-time digital credits and use them to generate real estate marketing videos. {providerConfig.pricingPaymentNote}
             </p>
           </div>
