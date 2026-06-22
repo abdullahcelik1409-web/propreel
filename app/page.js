@@ -142,8 +142,7 @@ export default function LandingPage() {
               <div className="absolute inset-x-5 bottom-5 rounded-xl border border-white/15 bg-[#071010]/75 p-4 backdrop-blur-xl">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-black">Ocean View Villa</h2>
-                    <p className="mt-1 text-sm text-[var(--pr-muted)]">Luxury showcase / 30s property video</p>
+                    <p className="text-sm font-semibold text-[var(--pr-muted)]">Luxury showcase / 30s property video</p>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--pr-cyan)] text-[#002020] shadow-[0_0_34px_rgba(0,251,251,0.18)]">
                     <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden="true">
