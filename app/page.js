@@ -123,7 +123,19 @@ export default function LandingPage() {
 
         <div className="pr-section min-w-0 p-4 shadow-2xl">
           <div className="relative overflow-hidden rounded-xl border border-[var(--pr-border-soft)] bg-[#071010]">
-            <div className="relative aspect-[16/11] bg-[linear-gradient(135deg,#e4eee9_0%,#b9d7cf_22%,#405c56_44%,#10201f_72%,#071010_100%)]">
+            <div className="relative aspect-[16/11] bg-[#10201f]">
+              <video
+                className="absolute inset-0 h-full w-full object-cover"
+                src="/assets/hero-campaign-preview.mp4"
+                poster="/assets/hero-campaign-preview.jpg"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-hidden="true"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,16,16,0.10),rgba(7,16,16,0.18)_45%,rgba(7,16,16,0.40))]" />
               <div className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-xs font-black text-white backdrop-blur">
                 Campaign preview
               </div>
