@@ -136,39 +136,19 @@ export default function LandingPage() {
                 aria-hidden="true"
               />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,16,16,0.10),rgba(7,16,16,0.18)_45%,rgba(7,16,16,0.40))]" />
-              <div className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-xs font-black text-white backdrop-blur">
-                Campaign preview
-              </div>
-              <div className="absolute inset-x-5 bottom-5 rounded-xl border border-white/15 bg-[#071010]/75 p-4 backdrop-blur-xl">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--pr-muted)]">Luxury showcase / 30s property video</p>
-                  </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--pr-cyan)] text-[#002020] shadow-[0_0_34px_rgba(0,251,251,0.18)]">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden="true">
-                      <path d="M8 5L19 12L8 19V5Z" fill="currentColor" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="pr-pill">Multi Image</span>
-                  <span className="pr-pill">Cinematic Luxury</span>
-                  <span className="pr-pill">Ready to download</span>
-                </div>
-              </div>
             </div>
             <div className="grid gap-px bg-[var(--pr-border-soft)] sm:grid-cols-3">
               <div className="bg-[#071010] p-4">
                 <p className="text-xs uppercase tracking-[0.14em] text-[var(--pr-dim)]">Input</p>
-                <p className="mt-1 font-bold">4 listing photos</p>
+                <p className="mt-1 font-bold">10 listing photos</p>
               </div>
               <div className="bg-[#071010] p-4">
                 <p className="text-xs uppercase tracking-[0.14em] text-[var(--pr-dim)]">Context</p>
-                <p className="mt-1 font-bold">Price, rooms, location</p>
+                <p className="mt-1 font-bold">AI-built sales story</p>
               </div>
               <div className="bg-[#071010] p-4">
                 <p className="text-xs uppercase tracking-[0.14em] text-[var(--pr-dim)]">Output</p>
-                <p className="mt-1 font-bold">Marketing video</p>
+                <p className="mt-1 font-bold">Ready-to-share reel</p>
               </div>
             </div>
           </div>
