@@ -55,10 +55,10 @@ export default async function AdminPage() {
   return (
     <main className="pr-shell min-h-screen p-6">
       <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <p className="pr-kicker">Platform control</p>
-          <h1 className="mt-1 text-2xl font-black tracking-tight">Admin Dashboard</h1>
-          <p className="mt-1 text-sm text-[var(--pr-muted)]">Manage users, generated videos, and credit balances.</p>
+        <div className="pr-section p-6">
+          <p className="pr-kicker text-[var(--pr-cyan)]">Platform control</p>
+          <h1 className="mt-1 text-3xl font-black tracking-tight">Admin Dashboard</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--pr-muted)]">Manage users, generated videos, payment events, and credit balances.</p>
         </div>
 
         <AdminDashboardTabs

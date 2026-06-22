@@ -47,11 +47,25 @@ export default function AuthForm({ mode, googleEnabled = false }) {
 
   return (
     <div className="pr-shell min-h-screen px-6 py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col justify-center">
-        <Link href="/" className="mb-8 flex justify-center" aria-label="Viseo home">
-          <BrandLogo size="lg" />
-        </Link>
-        <div className="pr-section p-6 shadow-2xl">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-8 lg:grid-cols-[1fr_430px]">
+        <section className="hidden min-h-[560px] overflow-hidden rounded-2xl border border-[var(--pr-border-soft)] bg-[linear-gradient(135deg,rgba(0,251,251,0.12),rgba(233,193,118,0.08)),linear-gradient(160deg,#122321,#071010)] p-8 shadow-2xl lg:flex lg:flex-col lg:justify-end">
+          <div className="mb-auto">
+            <BrandLogo size="lg" />
+          </div>
+          <div className="max-w-xl">
+            <p className="pr-kicker text-[var(--pr-cyan)]">Agent workspace</p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight">Create, manage, and download property videos from one workspace.</h2>
+            <p className="mt-4 text-sm leading-7 text-[var(--pr-muted)]">
+              Sign in to access listings, credit packages, generated videos, and production status.
+            </p>
+          </div>
+        </section>
+
+        <div>
+          <Link href="/" className="mb-8 flex justify-center lg:hidden" aria-label="Viseo home">
+            <BrandLogo size="lg" />
+          </Link>
+          <div className="pr-section p-6 shadow-2xl">
           <p className="pr-kicker text-[var(--pr-cyan)]">Agent workspace</p>
           <h1 className="mt-2 text-2xl font-black tracking-tight">{isRegister ? "Start free with starter credits" : "Welcome back"}</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--pr-muted)]">
@@ -114,6 +128,7 @@ export default function AuthForm({ mode, googleEnabled = false }) {
               {isRegister ? "Login" : "Start free"}
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>

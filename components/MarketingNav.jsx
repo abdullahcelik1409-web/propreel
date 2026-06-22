@@ -13,9 +13,9 @@ export default async function MarketingNav() {
         <BrandLogo />
       </Link>
       <div className="flex items-center gap-2">
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-1 rounded-full border border-[var(--pr-border-soft)] bg-[#071010]/60 p-1 md:flex">
           {MARKETING_NAV_LINKS.map(([label, href]) => (
-            <Link key={href} href={href} className="rounded-md px-3 py-2 text-sm font-semibold text-[var(--pr-muted)] transition hover:text-white">
+            <Link key={href} href={href} className="rounded-full px-3 py-2 text-sm font-semibold text-[var(--pr-muted)] transition hover:bg-[var(--pr-cyan-soft)] hover:text-white">
               {label}
             </Link>
           ))}
@@ -29,8 +29,8 @@ export default async function MarketingNav() {
             <Link href="/auth/login" className="pr-secondary px-4 py-2 text-sm font-semibold">
               Login
             </Link>
-            <Link href="/auth/register" className="rounded-md border border-[var(--pr-cyan)]/35 px-3 py-2 text-sm font-black text-[var(--pr-cyan)] transition hover:bg-[var(--pr-cyan-soft)] sm:px-4">
-              Sign up →
+            <Link href="/auth/register" className="rounded-lg border border-[var(--pr-cyan)]/35 bg-[var(--pr-cyan-soft)] px-3 py-2 text-sm font-black text-[var(--pr-cyan)] transition hover:border-[var(--pr-cyan)] hover:bg-[rgba(0,251,251,0.16)] sm:px-4">
+              Sign up
             </Link>
           </>
         )}

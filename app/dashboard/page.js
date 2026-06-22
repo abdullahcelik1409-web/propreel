@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <section className="pr-section overflow-hidden p-6">
-        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px] lg:items-end">
           <div>
             <p className="pr-kicker text-[var(--pr-cyan)]">Credit balance</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">{user.credits} credits available</h1>
@@ -28,13 +28,17 @@ export default async function DashboardPage() {
               Basic videos use {VIDEO_GENERATION_CREDIT_COST} credits. Multi Image videos use {MULTI_IMAGE_VIDEO_CREDIT_COSTS[10]} credits for 10s or {MULTI_IMAGE_VIDEO_CREDIT_COSTS[30]} credits for 30s.
             </p>
           </div>
-          <Link href="/dashboard/listings/new" className="pr-primary px-4 py-2 text-center text-sm">
-            Add property
-          </Link>
+          <div className="rounded-2xl border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--pr-cyan)]">Next action</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--pr-muted)]">Create a property profile, then generate a marketing video from its photos.</p>
+            <Link href="/dashboard/listings/new" className="pr-primary mt-4 block px-4 py-2 text-center text-sm">
+              Add property
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="flex items-end justify-between gap-4">
+      <section className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <p className="pr-kicker">Portfolio</p>
           <h2 className="mt-1 text-xl font-bold">Recent listings</h2>
@@ -44,8 +48,12 @@ export default async function DashboardPage() {
       {listings.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">{listings.map((listing) => <ListingCard key={listing.id} listing={listing} />)}</div>
       ) : (
-        <div className="pr-section-flat p-10 text-center text-[var(--pr-muted)]">
-          No listings yet. Add a property to start building your video library.
+        <div className="pr-section-flat p-10 text-center">
+          <p className="text-lg font-bold text-white">No listings yet</p>
+          <p className="mt-2 text-sm text-[var(--pr-muted)]">Add a property to start building your video library.</p>
+          <Link href="/dashboard/listings/new" className="pr-primary mt-5 inline-flex px-4 py-2 text-sm">
+            Add property
+          </Link>
         </div>
       )}
 
@@ -62,7 +70,10 @@ export default async function DashboardPage() {
         {videos.length ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">{videos.map((video) => <VideoCard key={video.id} video={video} />)}</div>
         ) : (
-          <div className="pr-section-flat p-10 text-center text-[var(--pr-muted)]">Generated videos will appear here.</div>
+          <div className="pr-section-flat p-10 text-center">
+            <p className="text-lg font-bold text-white">No videos yet</p>
+            <p className="mt-2 text-sm text-[var(--pr-muted)]">Generated videos will appear here.</p>
+          </div>
         )}
       </section>
     </div>

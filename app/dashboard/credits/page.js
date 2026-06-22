@@ -25,10 +25,18 @@ export default async function CreditsPage() {
   return (
     <div className="space-y-6">
       <div className="pr-section p-6">
-        <p className="pr-kicker">Current balance</p>
-        <div className="mt-3"><CreditBadge credits={user.credits} /></div>
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div>
+            <p className="pr-kicker text-[var(--pr-cyan)]">Current balance</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight">Credit wallet</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--pr-muted)]">
+              Buy USD credit packages and track every debit, refund, and manual credit event.
+            </p>
+          </div>
+          <CreditBadge credits={user.credits} />
+        </div>
       </div>
-      <div className="flex flex-col gap-3 rounded-lg border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)] md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] p-4 text-sm font-semibold text-[var(--pr-cyan)] md:flex-row md:items-center md:justify-between">
         <span>Buy digital credits through secure {providerConfig.displayName} checkout.</span>
         <Link href="/pricing" className="pr-primary px-4 py-2 text-center text-sm">
           View Pricing
@@ -37,9 +45,9 @@ export default async function CreditsPage() {
       <div>
         <PricingPlans packages={packages} compact />
       </div>
-      <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-[#071010] text-[var(--pr-muted)]">
+      <div className="pr-table-wrap">
+        <table className="pr-table">
+          <thead>
             <tr><th className="p-3">Date</th><th className="p-3">Action</th><th className="p-3">Credits</th><th className="p-3">Note</th></tr>
           </thead>
           <tbody>

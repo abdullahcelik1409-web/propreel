@@ -19,11 +19,11 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
 
   return (
     <div className="space-y-6">
-      <div className="inline-flex rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-1">
+      <div className="inline-flex rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-1">
         <button
           type="button"
           onClick={() => setActiveTab("management")}
-          className={`rounded-md px-4 py-2 text-sm font-bold transition ${
+          className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
             activeTab === "management" ? "bg-[var(--pr-cyan)] text-[#002020]" : "text-[var(--pr-muted)] hover:bg-[var(--pr-cyan-soft)] hover:text-white"
           }`}
           aria-pressed={activeTab === "management"}
@@ -33,7 +33,7 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
         <button
           type="button"
           onClick={() => setActiveTab("usage")}
-          className={`rounded-md px-4 py-2 text-sm font-bold transition ${
+          className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
             activeTab === "usage" ? "bg-[var(--pr-cyan)] text-[#002020]" : "text-[var(--pr-muted)] hover:bg-[var(--pr-cyan-soft)] hover:text-white"
           }`}
           aria-pressed={activeTab === "usage"}
@@ -45,23 +45,23 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
       {activeTab === "management" ? (
         <div className="space-y-6">
           <section className="grid gap-4 md:grid-cols-3">
-            <div className="pr-section-flat p-5">
+            <div className="pr-card p-5">
               <p className="text-sm text-[var(--pr-muted)]">Total Users</p>
               <p className="mt-2 text-3xl font-black">{users.length}</p>
             </div>
-            <div className="pr-section-flat p-5">
+            <div className="pr-card p-5">
               <p className="text-sm text-[var(--pr-muted)]">Total Videos Generated</p>
               <p className="mt-2 text-3xl font-black">{totalVideos}</p>
             </div>
-            <div className="pr-section-flat p-5">
+            <div className="pr-card p-5">
               <p className="text-sm text-[var(--pr-muted)]">Credits in Circulation</p>
               <p className="mt-2 text-3xl font-black">{creditsInCirculation}</p>
             </div>
           </section>
 
-          <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-[#071010] text-[var(--pr-muted)]">
+          <div className="pr-table-wrap">
+            <table className="pr-table">
+              <thead>
                 <tr>
                   <th className="p-3">Email</th>
                   <th className="p-3">Name</th>
@@ -95,12 +95,12 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
             </table>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-[var(--pr-border-soft)]">
+          <div className="pr-table-wrap">
             <div className="border-b border-[var(--pr-border-soft)] bg-[#071010] p-4">
               <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">Recent {activePaymentProvider} Payments</p>
             </div>
-            <table className="w-full text-left text-sm">
-              <thead className="bg-[#071010] text-[var(--pr-muted)]">
+            <table className="pr-table">
+              <thead>
                 <tr>
                   <th className="p-3">Transaction</th>
                   <th className="p-3">Provider</th>

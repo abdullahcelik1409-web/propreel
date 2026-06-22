@@ -115,10 +115,10 @@ export default function NewListingForm() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+    <div className="mx-auto max-w-7xl space-y-6">
+      <div className="pr-section flex flex-col justify-between gap-4 p-6 lg:flex-row lg:items-end">
         <div>
-          <p className="pr-kicker">Portfolio intake</p>
+          <p className="pr-kicker text-[var(--pr-cyan)]">Portfolio intake</p>
           <h1 className="mt-1 text-3xl font-black tracking-tight">Create Listing</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--pr-muted)]">
             Enter the core property details, selling points, and photos needed for video generation.
@@ -137,7 +137,7 @@ export default function NewListingForm() {
             <div
               key={item.id}
               aria-current={active ? "step" : undefined}
-              className={`rounded-lg border p-4 text-left ${
+              className={`rounded-2xl border p-4 text-left ${
                 active
                   ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]"
                   : complete
@@ -155,7 +155,7 @@ export default function NewListingForm() {
         })}
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <section className="pr-section p-5 md:p-6">
           {step === 1 && (
             <div className="space-y-6">
@@ -194,7 +194,7 @@ export default function NewListingForm() {
                       key={type}
                       type="button"
                       onClick={() => setField("propertyType", type)}
-                      className={`rounded-lg border p-4 text-left transition ${
+                      className={`rounded-xl border p-4 text-left transition ${
                         form.propertyType === type
                           ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)] text-[var(--pr-text)]"
                           : "border-[var(--pr-border-soft)] bg-[#071010] text-[var(--pr-muted)] hover:border-[rgba(0,251,251,0.35)]"
@@ -224,7 +224,7 @@ export default function NewListingForm() {
                       key={feature}
                       type="button"
                       onClick={() => toggleFeature(feature)}
-                      className={`rounded-md border p-3 text-left text-sm font-bold transition ${
+                    className={`rounded-xl border p-3 text-left text-sm font-bold transition ${
                         selected
                           ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)] text-[var(--pr-text)]"
                           : "border-[var(--pr-border-soft)] bg-[#071010] text-[var(--pr-muted)] hover:border-[rgba(0,251,251,0.35)]"
@@ -258,7 +258,7 @@ export default function NewListingForm() {
                   event.preventDefault();
                   uploadFiles(event.dataTransfer.files);
                 }}
-                className="flex min-h-52 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-[var(--pr-border-soft)] bg-[#071010] p-8 text-center hover:border-[rgba(0,251,251,0.45)]"
+                className="flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--pr-border-soft)] bg-[#071010] p-8 text-center transition hover:border-[rgba(0,251,251,0.45)] hover:bg-[rgba(0,251,251,0.03)]"
               >
                 <input type="file" accept="image/*" multiple className="hidden" onChange={(event) => uploadFiles(event.target.files)} />
                 <span className="font-bold">{uploading ? "Uploading..." : "Drag photos here or click to upload"}</span>
@@ -269,12 +269,12 @@ export default function NewListingForm() {
               </p>
               <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {form.photos.map((photo, index) => (
-                  <div key={photo} className="group relative aspect-square overflow-hidden rounded-md border border-[var(--pr-border-soft)]">
+                  <div key={photo} className="group relative aspect-square overflow-hidden rounded-xl border border-[var(--pr-border-soft)]">
                     <img src={photo} alt={`Photo ${index + 1}`} className="h-full w-full object-cover" />
                     <button
                       type="button"
                       onClick={() => setForm((prev) => ({ ...prev, photos: prev.photos.filter((item) => item !== photo) }))}
-                      className="absolute right-2 top-2 rounded-md bg-black/75 px-2 py-1 text-xs font-bold text-white opacity-0 transition group-hover:opacity-100"
+                      className="absolute right-2 top-2 rounded-lg bg-black/75 px-2 py-1 text-xs font-bold text-white opacity-0 transition group-hover:opacity-100"
                     >
                       Delete
                     </button>
@@ -300,7 +300,7 @@ export default function NewListingForm() {
             <SnapshotRow label="Photos" value={`${form.photos.length}/${MAX_LISTING_PHOTOS}`} />
           </div>
 
-          <div className="mt-5 rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-3">
+          <div className="mt-5 rounded-2xl border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-3">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-gold)]">Next output</p>
             <p className="mt-1 text-sm leading-6 text-[var(--pr-muted)]">After saving, this listing opens directly in the property video generator.</p>
           </div>

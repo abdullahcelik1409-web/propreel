@@ -51,12 +51,21 @@ export default function PricingPage() {
     <main className="pr-shell min-h-screen">
       <MarketingNav />
       <section className="mx-auto max-w-7xl px-6 py-14">
-        <div className="max-w-3xl">
-          <p className="pr-kicker">Pricing</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent USD credit packages</h1>
-          <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
-            Buy digital credits and use them to generate real estate marketing videos. {providerConfig.pricingPaymentNote}
-          </p>
+        <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
+          <div className="max-w-3xl">
+            <p className="pr-kicker">Pricing</p>
+            <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Transparent USD credit packages</h1>
+            <p className="mt-5 text-lg leading-8 text-[var(--pr-muted)]">
+              Buy one-time digital credits and use them to generate real estate marketing videos. {providerConfig.pricingPaymentNote}
+            </p>
+          </div>
+          <div className="pr-section-flat p-5">
+            <p className="pr-kicker text-[var(--pr-cyan)]">Payment model</p>
+            <p className="mt-2 text-2xl font-black">USD / one-time</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--pr-muted)]">
+              No subscription. Credits are delivered after confirmed checkout.
+            </p>
+          </div>
         </div>
         <div className="mt-10">
           <PricingPlans packages={packages} />

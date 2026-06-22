@@ -55,12 +55,14 @@ export default function ListingCard({ listing }) {
   if (deleted) return null;
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-[var(--pr-border-soft)] bg-[var(--pr-surface)] transition hover:border-[rgba(0,251,251,0.35)]">
+    <article className="group overflow-hidden rounded-2xl border border-[var(--pr-border-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(7,16,16,0.92))] transition hover:-translate-y-1 hover:border-[rgba(0,251,251,0.35)] hover:shadow-[0_18px_48px_rgba(0,0,0,0.25)]">
       <div className="aspect-[4/3] bg-[#071010]">
         {photo ? (
           <img src={photo} alt={listing.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-[var(--pr-dim)]">No photo</div>
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-[var(--pr-dim)]">
+            <span className="rounded-full border border-[var(--pr-border-soft)] px-3 py-1">No photo</span>
+          </div>
         )}
       </div>
       <div className="space-y-3 p-4">
@@ -83,14 +85,14 @@ export default function ListingCard({ listing }) {
         <button
           type="button"
           onClick={() => setConfirmOpen(true)}
-          className="w-full rounded-md border border-red-500/30 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/10"
+          className="pr-danger-secondary w-full px-3 py-2 text-sm font-semibold"
         >
           Delete
         </button>
       </div>
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-lg border border-[var(--pr-border-soft)] bg-[var(--pr-surface)] p-5 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-[var(--pr-border-soft)] bg-[var(--pr-surface)] p-5 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-300">Delete listing</p>
@@ -99,7 +101,7 @@ export default function ListingCard({ listing }) {
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}
-                className="rounded-md border border-white/10 px-2 py-1 text-sm text-white/55 hover:bg-white/5 hover:text-white"
+                className="rounded-lg border border-white/10 px-2 py-1 text-sm text-white/55 hover:bg-white/5 hover:text-white"
               >
                 Close
               </button>
@@ -107,7 +109,7 @@ export default function ListingCard({ listing }) {
             <p className="mt-4 text-sm leading-6 text-white/55">
               This listing and its property details will be permanently removed. Generated videos stay in your video library.
             </p>
-            <div className="mt-4 rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-3">
+            <div className="mt-4 rounded-xl border border-[var(--pr-border-soft)] bg-[#071010] p-3">
               <p className="line-clamp-1 text-sm font-semibold text-white">{listing.title}</p>
               <p className="mt-1 text-xs text-[var(--pr-muted)]">{listing.location || "Location not set"}</p>
             </div>
@@ -117,7 +119,7 @@ export default function ListingCard({ listing }) {
                 type="button"
                 onClick={() => setConfirmOpen(false)}
                 disabled={deleting}
-                className="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-white/70 hover:bg-white/5 disabled:opacity-50"
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-white/70 hover:bg-white/5 disabled:opacity-50"
               >
                 Keep it
               </button>
@@ -125,7 +127,7 @@ export default function ListingCard({ listing }) {
                 type="button"
                 onClick={deleteListing}
                 disabled={deleting}
-                className="rounded-md bg-red-400 px-4 py-2 text-sm font-bold text-[#1b0505] hover:bg-red-300 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-red-400 px-4 py-2 text-sm font-bold text-[#1b0505] hover:bg-red-300 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deleting ? "Deleting..." : "Delete forever"}
               </button>

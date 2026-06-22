@@ -108,19 +108,20 @@ export default function PricingPlans({ packages, compact = false }) {
           return (
             <article
               key={pack.id}
-              className={`relative flex flex-col rounded-lg border p-5 transition hover:-translate-y-1 ${
+              className={`relative flex min-h-[360px] flex-col overflow-hidden rounded-2xl border p-5 transition hover:-translate-y-1 ${
                 flagship
-                  ? "border-[var(--pr-gold)] bg-[#17160f] shadow-[0_0_34px_rgba(255,209,102,0.14)]"
+                  ? "border-[var(--pr-gold)] bg-[linear-gradient(180deg,rgba(233,193,118,0.16),rgba(7,16,16,0.92))] shadow-[0_0_34px_rgba(255,209,102,0.14)]"
                   : premium
-                    ? "border-[var(--pr-gold)]/45 bg-[#111411] shadow-[0_0_28px_rgba(255,209,102,0.08)]"
+                    ? "border-[var(--pr-gold)]/45 bg-[linear-gradient(180deg,rgba(233,193,118,0.09),rgba(7,16,16,0.9))] shadow-[0_0_28px_rgba(255,209,102,0.08)]"
                     : highlighted
-                      ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)] shadow-[0_0_34px_rgba(0,251,251,0.10)]"
-                      : "border-[var(--pr-border-soft)] bg-[var(--pr-surface)]"
+                      ? "border-[var(--pr-cyan)] bg-[linear-gradient(180deg,rgba(0,251,251,0.11),rgba(7,16,16,0.9))] shadow-[0_0_34px_rgba(0,251,251,0.10)]"
+                      : "border-[var(--pr-border-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(7,16,16,0.9))]"
               }`}
             >
+              <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               {badge && (
                 <span
-                  className={`absolute right-4 top-4 max-w-[calc(100%-2rem)] rounded-md border bg-[#071010] px-3 py-1 text-right text-[11px] font-black uppercase leading-4 ${
+                  className={`absolute right-4 top-4 max-w-[calc(100%-2rem)] rounded-full border bg-[#071010] px-3 py-1 text-right text-[11px] font-black uppercase leading-4 ${
                     premium
                       ? "border-[var(--pr-gold)]/40 text-[var(--pr-gold)]"
                       : "border-[var(--pr-cyan)]/30 text-[var(--pr-cyan)]"
@@ -130,7 +131,7 @@ export default function PricingPlans({ packages, compact = false }) {
                 </span>
               )}
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-md border bg-[#071010] ${
+                className={`flex h-11 w-11 items-center justify-center rounded-xl border bg-[#071010] ${
                   premium
                     ? "border-[var(--pr-gold)]/40 text-[var(--pr-gold)]"
                     : "border-[var(--pr-border-soft)] text-[var(--pr-cyan)]"
@@ -139,17 +140,17 @@ export default function PricingPlans({ packages, compact = false }) {
                 <PlanIcon id={pack.id} />
               </div>
               <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-[var(--pr-muted)]">{pack.name}</p>
-              <div className="mt-3 flex items-end gap-2">
+              <div className="mt-3 flex flex-wrap items-end gap-2">
                 <p className="text-4xl font-black tabular-nums text-white">{formatUsd(pack.priceUsd)}</p>
                 <p className="pb-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-dim)]">USD / one-time</p>
               </div>
-              <p className="mt-2 text-lg font-bold text-[var(--pr-muted)]">{pack.credits.toLocaleString("en-US")} credits</p>
+              <p className="mt-2 text-lg font-bold text-[var(--pr-cyan)]">{pack.credits.toLocaleString("en-US")} credits</p>
               <p className="mt-3 min-h-12 text-sm leading-6 text-[var(--pr-muted)]">{pack.description}</p>
               {!compact && (
                 <ul className="mt-5 flex-1 space-y-3 text-sm text-[var(--pr-muted)]">
                   {pack.features.map((feature) => (
                     <li key={feature} className="flex gap-2">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-[var(--pr-cyan)]" />
+                      <span className={`mt-1 h-2 w-2 rounded-full ${premium ? "bg-[var(--pr-gold)]" : "bg-[var(--pr-cyan)]"}`} />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -159,7 +160,9 @@ export default function PricingPlans({ packages, compact = false }) {
                 type="button"
                 onClick={() => startCheckout(pack)}
                 disabled={loading}
-                className="pr-primary mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-70"
+                className={`mt-6 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                  premium ? "border border-[var(--pr-gold)]/45 bg-[var(--pr-gold)] text-[#221700] hover:bg-[#ffe2a2]" : "pr-primary"
+                }`}
               >
                 <LockIcon /> {loading ? "Opening checkout..." : pack.checkoutLabel || "Buy Now"}
               </button>
@@ -173,7 +176,7 @@ export default function PricingPlans({ packages, compact = false }) {
 
       {selectedPackage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-5 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-5 shadow-2xl">
             <p className="pr-kicker">Secure payment</p>
             <h2 className="mt-2 text-xl font-black">{selectedPackage.name}</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--pr-muted)]">
@@ -187,7 +190,7 @@ export default function PricingPlans({ packages, compact = false }) {
               <button
                 type="button"
                 onClick={() => setSelectedPackage(null)}
-                className="rounded-md border border-[var(--pr-border-soft)] px-4 py-2 text-sm text-[var(--pr-muted)] transition hover:text-white"
+                className="rounded-lg border border-[var(--pr-border-soft)] px-4 py-2 text-sm text-[var(--pr-muted)] transition hover:text-white"
               >
                 Close
               </button>

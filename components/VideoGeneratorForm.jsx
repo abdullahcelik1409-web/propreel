@@ -206,7 +206,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   };
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)_320px]">
+    <div className="grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)_340px]">
       <aside className="pr-section h-fit p-4 xl:sticky xl:top-24">
         <p className="pr-kicker">Production steps</p>
         <div className="mt-4 space-y-3">
@@ -216,9 +216,9 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             ["03", "Style", "Set creative direction"],
             ["04", "Review", "Confirm cost and generate"],
           ].map(([number, title, body]) => (
-            <div key={number} className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-3">
+            <div key={number} className="rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-3">
               <div className="flex items-center gap-3">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--pr-cyan)] text-xs font-black text-[#002020]">{number}</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--pr-cyan)] text-xs font-black text-[#002020]">{number}</span>
                 <span className="font-semibold">{title}</span>
               </div>
               <p className="mt-2 text-xs leading-5 text-[var(--pr-muted)]">{body}</p>
@@ -243,9 +243,9 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               <p className="mt-2 text-sm text-[var(--pr-muted)]">{listing.location || "Location not set"}</p>
               <p className="mt-4 text-2xl font-black tabular-nums text-[var(--pr-cyan)]">{formatPriceLabel(listing.price)}</p>
               <div className="mt-5 grid grid-cols-3 gap-2 text-center text-sm">
-                <span className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] py-2 text-[var(--pr-muted)]">{listing.bedrooms || "-"} beds</span>
-                <span className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] py-2 text-[var(--pr-muted)]">{listing.bathrooms || "-"} baths</span>
-                <span className="rounded-md border border-[var(--pr-border-soft)] bg-[#071010] py-2 text-[var(--pr-muted)]">{listing.sqft || "-"} sqft</span>
+                <span className="rounded-xl border border-[var(--pr-border-soft)] bg-[#071010] py-2 text-[var(--pr-muted)]">{listing.bedrooms || "-"} beds</span>
+                <span className="rounded-xl border border-[var(--pr-border-soft)] bg-[#071010] py-2 text-[var(--pr-muted)]">{listing.bathrooms || "-"} baths</span>
+                <span className="rounded-xl border border-[var(--pr-border-soft)] bg-[#071010] py-2 text-[var(--pr-muted)]">{listing.sqft || "-"} sqft</span>
               </div>
               {listing.propertyType && <p className="mt-4 text-sm text-[var(--pr-gold)]">{listing.propertyType}</p>}
               {listing.description && <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--pr-muted)]">{listing.description}</p>}
@@ -260,7 +260,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               <h2 className="mt-1 text-xl font-bold">Video setup</h2>
               <p className="mt-1 text-sm text-[var(--pr-muted)]">Mode, format, duration, and photo selection are locked before generation starts.</p>
             </div>
-            <span className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] px-3 py-2 text-sm font-bold text-[var(--pr-gold)]">
+            <span className="rounded-full border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] px-3 py-2 text-sm font-bold text-[var(--pr-gold)]">
               {creditCost} credits
             </span>
           </div>
@@ -274,11 +274,11 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                 key={value}
                 type="button"
                 onClick={() => chooseVideoMode(value)}
-                className={`rounded-lg border p-4 text-left transition ${selected ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : premiumCard ? "border-[var(--pr-gold)]/45 bg-[var(--pr-gold-soft)] hover:border-[var(--pr-gold)]/70" : "border-[var(--pr-border-soft)] bg-[#071010] opacity-80 hover:border-[rgba(0,251,251,0.25)] hover:opacity-100"}`}
+                className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 ${selected ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : premiumCard ? "border-[var(--pr-gold)]/45 bg-[var(--pr-gold-soft)] hover:border-[var(--pr-gold)]/70" : "border-[var(--pr-border-soft)] bg-[#071010] opacity-80 hover:border-[rgba(0,251,251,0.25)] hover:opacity-100"}`}
               >
                 <span className="flex flex-wrap items-center gap-2 font-bold">
                   {label}
-                  <span className={`rounded-md border px-2 py-1 text-[10px] uppercase tracking-[0.12em] ${premiumCard ? "border-[var(--pr-gold)]/35 bg-[var(--pr-gold-soft)] text-[var(--pr-gold)]" : "border-[var(--pr-border-soft)] bg-[#071010] text-[var(--pr-muted)]"}`}>{badge}</span>
+                  <span className={`rounded-full border px-2 py-1 text-[10px] uppercase tracking-[0.12em] ${premiumCard ? "border-[var(--pr-gold)]/35 bg-[var(--pr-gold-soft)] text-[var(--pr-gold)]" : "border-[var(--pr-border-soft)] bg-[#071010] text-[var(--pr-muted)]"}`}>{badge}</span>
                 </span>
                 <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">{description}</span>
                 <span className={`mt-3 block text-xs leading-5 ${muted ? "text-[var(--pr-muted)]" : "font-semibold text-[var(--pr-gold)]"}`}>
@@ -298,11 +298,11 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                     key={value}
                     type="button"
                     onClick={() => setFormat(value)}
-                    className={`rounded-lg border p-4 text-left transition ${format === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
+                    className={`rounded-2xl border p-4 text-left transition ${format === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
                   >
                     <span className="flex flex-wrap items-center gap-2 text-lg font-black">
                       {title}
-                      {badge && <span className="rounded-md border border-[var(--pr-cyan)]/25 bg-[#071010] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-cyan)]">{badge}</span>}
+                      {badge && <span className="rounded-full border border-[var(--pr-cyan)]/25 bg-[#071010] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[var(--pr-cyan)]">{badge}</span>}
                     </span>
                     <span className="mt-2 block text-sm leading-6 text-[var(--pr-muted)]">{description}</span>
                   </button>
@@ -319,7 +319,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                       key={value}
                       type="button"
                       onClick={() => setMultiImageDuration(value)}
-                      className={`rounded-lg border p-4 text-left transition ${multiImageDuration === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
+                      className={`rounded-2xl border p-4 text-left transition ${multiImageDuration === value ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
                     >
                       <span className="block text-lg font-black">{value}s</span>
                       <span className="text-sm text-[var(--pr-muted)]">{getMultiImageCreditCost(value)} credits</span>
@@ -339,19 +339,19 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                     {premiumSelected ? premiumUiCopy.photoValidation : `Select at least 1 and up to ${MULTI_IMAGE_MAX_IMAGES} listing photos.`}
                   </p>
                 </div>
-                <p className="rounded-md border border-[var(--pr-border-soft)] px-3 py-1.5 text-xs font-bold text-[var(--pr-muted)]">
+                <p className="rounded-full border border-[var(--pr-border-soft)] px-3 py-1.5 text-xs font-bold text-[var(--pr-muted)]">
                   {premiumSelected ? `${effectiveSelectedImages.length}/8 or 10 selected` : `${effectiveSelectedImages.length}/${MULTI_IMAGE_MAX_IMAGES} will be used`}
                 </p>
               </div>
               {premiumSelected && (
-                <div className={`mb-3 rounded-md border px-3 py-2 text-sm ${premiumPhotoCountValid ? "border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] text-[var(--pr-cyan)]" : "border-amber-500/25 bg-amber-500/10 text-amber-100"}`}>
+                <div className={`mb-3 rounded-2xl border px-3 py-2 text-sm ${premiumPhotoCountValid ? "border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] text-[var(--pr-cyan)]" : "border-amber-500/25 bg-amber-500/10 text-amber-100"}`}>
                   <p>{premiumUiCopy.formatDescription}</p>
                   <p className="mt-1">{premiumUiCopy.creditRequirement}</p>
                   {premiumDurationPlan?.valid && <p className="mt-1">Scene durations: {premiumDurationPlan.durations.join("s, ")}s.</p>}
                 </div>
               )}
               {!premiumSelected && selectedImageUrls.length < 1 && (
-                <p className="mb-3 rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+                <p className="mb-3 rounded-2xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
                   Select at least 1 photo to continue with Multi Image Video.
                 </p>
               )}
@@ -365,10 +365,10 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                       type="button"
                       disabled={disabled}
                       onClick={() => toggleImage(photo)}
-                      className={`group relative aspect-square overflow-hidden rounded-md border text-left transition ${selected ? "border-[var(--pr-cyan)]" : "border-[var(--pr-border-soft)]"} ${disabled ? "cursor-not-allowed opacity-45" : "hover:border-[rgba(0,251,251,0.35)]"}`}
+                      className={`group relative aspect-square overflow-hidden rounded-2xl border text-left transition ${selected ? "border-[var(--pr-cyan)]" : "border-[var(--pr-border-soft)]"} ${disabled ? "cursor-not-allowed opacity-45" : "hover:border-[rgba(0,251,251,0.35)]"}`}
                     >
                       <img src={photo} alt={`Listing photo ${index + 1}`} className="h-full w-full object-cover" />
-                      <span className={`absolute left-2 top-2 rounded-md px-2 py-1 text-xs font-bold ${selected ? "bg-[var(--pr-cyan)] text-[#002020]" : "bg-black/75 text-white"}`}>
+                      <span className={`absolute left-2 top-2 rounded-full px-2 py-1 text-xs font-bold ${selected ? "bg-[var(--pr-cyan)] text-[#002020]" : "bg-black/75 text-white"}`}>
                         {selected ? "Selected" : `Photo ${index + 1}`}
                       </span>
                     </button>
@@ -388,7 +388,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                 key={template.id}
                 type="button"
                 onClick={() => chooseTemplate(template.id)}
-                className={`rounded-lg border p-4 text-left transition ${templateId === template.id ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
+                className={`rounded-2xl border p-4 text-left transition ${templateId === template.id ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
               >
                 <span className="block font-bold">{template.name}</span>
                 <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">{template.description}</span>
@@ -405,7 +405,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                   key={template.id}
                   type="button"
                   onClick={() => setSceneTemplateId(template.id)}
-                  className={`rounded-lg border p-4 text-left transition ${sceneTemplateId === template.id ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
+                  className={`rounded-2xl border p-4 text-left transition ${sceneTemplateId === template.id ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
                 >
                   <span className="block font-bold">{template.name}</span>
                   <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">{template.description}</span>
@@ -416,7 +416,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                   key={`disabled-${template.id}`}
                   type="button"
                   disabled
-                  className="cursor-not-allowed rounded-lg border border-[var(--pr-border-soft)] bg-[#071010] p-4 text-left opacity-45"
+                  className="cursor-not-allowed rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-4 text-left opacity-45"
                 >
                   <span className="block font-bold">{template.name}</span>
                   <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">
@@ -428,7 +428,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           </div>
           )}
           {premiumSelected && (
-            <div className="mt-6 rounded-md border border-[var(--pr-gold)]/25 bg-[var(--pr-gold-soft)] p-4">
+            <div className="mt-6 rounded-2xl border border-[var(--pr-gold)]/25 bg-[var(--pr-gold-soft)] p-4">
               <p className="text-sm font-bold text-[var(--pr-gold)]">Premium multi-scene continuity</p>
               <p className="mt-2 text-sm leading-6 text-[var(--pr-muted)]">
                 Create a smoother, more cinematic property walkthrough with bridge-frame planning, premium scene directives, and architecture-safe prompts.
@@ -442,7 +442,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           <h2 className="mt-1 text-xl font-bold">Overlays, music, and notes</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {[["showPrice", "Show Price"], ["showLocation", "Show Location"], ["showBeds", "Show Beds/Baths"], ["showAgent", "Show Agent Name"]].map(([key, label]) => (
-              <label key={key} className="flex items-center justify-between rounded-md border border-[var(--pr-border-soft)] bg-[#071010] p-3">
+              <label key={key} className="flex items-center justify-between rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-3">
                 <span className="font-semibold">{label}</span>
                 <input type="checkbox" checked={overlays[key]} onChange={() => toggle(key)} className="h-4 w-4 accent-[var(--pr-cyan)]" />
               </label>
@@ -467,12 +467,12 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
                     key={track.audio_id}
                     type="button"
                     onClick={() => chooseAudioTrack(track.audio_id)}
-                    className={`rounded-lg border p-4 text-left transition ${selected ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
+                className={`rounded-2xl border p-4 text-left transition ${selected ? "border-[var(--pr-cyan)] bg-[var(--pr-cyan-soft)]" : "border-[var(--pr-border-soft)] bg-[#071010] hover:border-[rgba(0,251,251,0.35)]"}`}
                   >
                     <span className="block font-bold">{track.label}</span>
                     <span className="mt-1 block text-sm leading-6 text-[var(--pr-muted)]">{track.description}</span>
                     {track.content_id_registered && (
-                      <span className="mt-3 block rounded-md border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
+                      <span className="mt-3 block rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
                         This track is marked as Content ID Registered. Social platforms may show an automatic claim warning.
                       </span>
                     )}
@@ -521,7 +521,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               <span className="font-semibold">{premiumSelected ? `${effectiveSelectedImages.length} selected` : `${effectiveSelectedImages.length}/${MULTI_IMAGE_MAX_IMAGES}`}</span>
             </div>
           )}
-          <div className="rounded-md border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-3">
+          <div className="rounded-2xl border border-[var(--pr-gold)]/30 bg-[var(--pr-gold-soft)] p-3">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--pr-gold)]">Cost</p>
             <p className="mt-1 text-2xl font-black tabular-nums text-[var(--pr-gold)]">{creditCost} credits</p>
             <p className="mt-1 text-xs text-[var(--pr-muted)]">Available: {userCredits} credits</p>
