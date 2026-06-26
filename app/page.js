@@ -2,7 +2,7 @@ import Link from "next/link";
 import MarketingNav from "@/components/MarketingNav";
 import PricingPlans from "@/components/PricingPlans";
 import { getCreditPackagesWithPaymentConfig } from "@/lib/paymentConfig";
-import { PRODUCTION_DEFAULT_USER_CREDITS } from "@/lib/videoConfig";
+import { INITIAL_USER_CREDITS } from "@/lib/videoConfig";
 
 const features = [
   {
@@ -89,7 +89,7 @@ export default function LandingPage() {
       <section className="mx-0 grid max-w-[390px] gap-10 px-4 pb-16 pt-10 sm:mx-auto sm:max-w-7xl sm:px-6 lg:grid-cols-[1.02fr_.98fr] lg:pb-24 lg:pt-16">
         <div className="flex min-w-0 flex-col justify-center">
           <div className="mb-5 inline-flex w-fit rounded-full border border-[var(--pr-cyan)]/25 bg-[var(--pr-cyan-soft)] px-4 py-2 text-xs font-bold text-[var(--pr-cyan)]">
-            {PRODUCTION_DEFAULT_USER_CREDITS} free credits with every new account
+            Get {INITIAL_USER_CREDITS} free credits with every new account
           </div>
           <h1 className="max-w-[22rem] break-words text-3xl font-black leading-[1.04] tracking-tight sm:max-w-4xl sm:text-4xl md:text-6xl">
             Property video production for modern real estate agents

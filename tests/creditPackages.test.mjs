@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-import { CREDIT_PACKAGES, premiumVideoConfig } from "../lib/videoConfig.js";
+import {
+  CREDIT_PACKAGES,
+  INITIAL_USER_CREDITS,
+  getInitialUserCredits,
+  premiumVideoConfig,
+} from "../lib/videoConfig.js";
 import {
   LEMON_SQUEEZY_PRODUCT_ID_ENV_KEYS,
   LEMON_SQUEEZY_VARIANT_ID_ENV_KEYS,
@@ -11,6 +16,11 @@ import {
 } from "../lib/paymentConfig.js";
 import { getActivePaymentProvider, getPaymentProviderConfig, paymentProviderConfig } from "../lib/payments/providerConfig.js";
 import { polarAdapter, verifyPolarWebhookSignature } from "../lib/payments/providers/polar.js";
+
+test("every new account receives the same 480-credit signup balance", () => {
+  assert.equal(INITIAL_USER_CREDITS, 480);
+  assert.equal(getInitialUserCredits(), INITIAL_USER_CREDITS);
+});
 
 test("credit package ids, USD prices, and credit amounts remain configured", () => {
   assert.deepEqual(
