@@ -27,6 +27,7 @@ import {
 } from "@/lib/videoConfig";
 import { DEFAULT_AUDIO_BY_VIDEO_STYLE, NO_AUDIO_OPTION, NO_AUDIO_TRACK_ID } from "@/lib/audioConfig";
 import TextTemplateSelector from "@/components/video/TextTemplateSelector";
+import VerticalPhotoCompatibility from "@/components/video/VerticalPhotoCompatibility";
 import {
   getAvailableTextTemplates,
   getTextTemplateVideoTemplateId,
@@ -125,6 +126,9 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   );
   const selectedTextTemplate = availableTextTemplates.find((template) => template.id === selectedTextTemplateId);
   const canGenerate = !loading && hasEnoughCredits && !!listing.photos?.length && hasValidPhotoSelection && (!textTemplatesEnabled || Boolean(selectedTextTemplate));
+  const verticalPreviewImageUrls = requiresPhotoSelection
+    ? effectiveSelectedImages
+    : (listing.photos || []).slice(0, 1);
   const generationDuration = premiumSelected
     ? `~${premiumVideoConfig.targetDurationSeconds}`
     : videoMode === VIDEO_MODE_MULTI_IMAGE
@@ -377,6 +381,10 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
               </div>
             )}
           </div>
+
+          {format === "9:16" && (
+            <VerticalPhotoCompatibility imageUrls={verticalPreviewImageUrls} />
+          )}
 
           {requiresPhotoSelection && (
             <div className="mt-6">

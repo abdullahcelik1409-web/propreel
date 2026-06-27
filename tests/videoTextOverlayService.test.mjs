@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import sharp from "sharp";
 
-import { buildOverlayFilterGraph, buildOverlaySvg, buildTextOverlayFallback } from "../lib/videoTextOverlayService.js";
+import { buildOverlayFilterGraph, buildOverlaySvg, buildTextOverlayFallback, getOverlayCoordinates, normalizeOverlayForRender } from "../lib/videoTextOverlayService.js";
 import { getFfmpegPath } from "../lib/ffmpegBinary.js";
 
 const overlay = {
@@ -27,6 +27,37 @@ test("overlay SVG escapes property content and stays within ratio-aware width", 
   assert.equal(card.width, Math.round(1920 * 0.58));
   assert.match(svg, /Villa &amp; Residence/);
   assert.match(svg, /fill-opacity="0.42"/);
+});
+
+test("CTA card stays inside horizontal and vertical safe areas", () => {
+  const cta = {
+    ...overlay,
+    isCta: true,
+    primaryContentSlot: "cta",
+    align: "center",
+    layout: { maxWidth: 76, xPercent: 50, yPercent: 82, anchorX: "center", anchorY: "bottom", safeAreaX: 7, safeAreaY: 12 },
+  };
+  const card = buildOverlaySvg(cta, 1080);
+  const placement = getOverlayCoordinates(cta, { width: 1080, height: 1920 }, card);
+  assert.ok(placement.x >= Math.round(1080 * 0.07));
+  assert.ok(placement.y >= Math.round(1920 * 0.12));
+  assert.ok(placement.x + card.width <= 1080 - Math.round(1080 * 0.07));
+  assert.ok(placement.y + card.height <= 1920 - Math.round(1920 * 0.12));
+  assert.match(card.svg.toString(), /stroke-opacity="0.78"/);
+});
+
+test("legacy lower-center CTA plans are upgraded to current ratio safe areas", () => {
+  const legacy = normalizeOverlayForRender({
+    ...overlay,
+    position: "lower-center",
+    align: "center",
+    layout: { maxWidth: 82, xPercent: 50, yPercent: 92, anchorX: "center", anchorY: "bottom", safeAreaX: 7, safeAreaY: 8 },
+  }, "9:16");
+  assert.equal(legacy.isCta, true);
+  assert.equal(legacy.primaryContentSlot, "cta");
+  assert.equal(legacy.layout.yPercent, 82);
+  assert.equal(legacy.layout.maxWidth, 76);
+  assert.equal(legacy.layout.safeAreaY, 12);
 });
 
 test("ffmpeg filter graph uses planned timing and alpha fades", () => {

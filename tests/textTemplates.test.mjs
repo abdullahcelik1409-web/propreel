@@ -102,6 +102,10 @@ test("overlay plan follows real scene durations and does not repeat text", () =>
 
   assert.deepEqual(plan.sceneDurations, [9, 7, 14]);
   assert.equal(plan.overlays.at(-1).primaryText, "DM for details");
+  assert.equal(plan.overlays.at(-1).isCta, true);
+  assert.equal(plan.overlays.at(-1).primaryContentSlot, "cta");
+  assert.equal(plan.overlays.at(-1).layout.yPercent, 82);
+  assert.equal(plan.overlays.at(-1).layout.maxWidth, 76);
   const allText = plan.overlays.flatMap((overlay) => [overlay.primaryText, overlay.secondaryText]).filter(Boolean).map((value) => value.toLowerCase());
   assert.equal(new Set(allText).size, allText.length);
   assert.equal(plan.overlays[0].layout.maxWidth, 82);
@@ -119,6 +123,8 @@ test("60 second plan supports the actual eight-scene premium duration plan", () 
   assert.equal(plan.sceneCount, 8);
   assert.equal(plan.sceneDurations.reduce((sum, value) => sum + value, 0), 60);
   assert.equal(plan.overlays.at(-1).primaryText, "DM for details");
+  assert.equal(plan.overlays.at(-1).layout.maxWidth, 46);
+  assert.equal(plan.overlays.at(-1).layout.yPercent, 88);
   assert.equal(plan.overlays[0].layout.maxWidth, 58);
 });
 

@@ -7,7 +7,7 @@ import test from "node:test";
 import sharp from "sharp";
 
 import { getFfmpegPath } from "../lib/ffmpegBinary.js";
-import { renderVideoToVerticalBlurCanvas } from "../lib/videoCanvasService.js";
+import { addOutputCanvasToFinalVideo, renderVideoToVerticalBlurCanvas } from "../lib/videoCanvasService.js";
 
 function runFfmpeg(ffmpegPath, args) {
   return new Promise((resolve, reject) => {
@@ -41,4 +41,14 @@ test("horizontal provider video is rendered onto a real 1080x1920 blur canvas", 
   } finally {
     await rm(workDir, { recursive: true, force: true });
   }
+});
+
+test("native portrait output bypasses blur canvas without downloading the video", async () => {
+  const result = await addOutputCanvasToFinalVideo({
+    video: { id: "portrait-video", format: "9:16" },
+    sourceVideoUrl: "https://cdn.example.com/native-portrait.mp4",
+    shouldApply: false,
+  });
+  assert.equal(result.applied, false);
+  assert.equal(result.finalVideoUrl, "https://cdn.example.com/native-portrait.mp4");
 });

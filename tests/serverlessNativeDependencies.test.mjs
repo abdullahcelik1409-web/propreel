@@ -23,3 +23,9 @@ test("video status finalization has enough Vercel runtime for FFmpeg post-proces
 
   assert.ok(maxDuration >= 120, `video status maxDuration must cover FFmpeg finalization, received ${maxDuration}`);
 });
+
+test("video generation has enough Vercel runtime for bounded image analysis", async () => {
+  const vercelConfig = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
+  const maxDuration = vercelConfig.functions?.["app/api/videos/generate/route.js"]?.maxDuration;
+  assert.ok(maxDuration >= 120, `video generate maxDuration must cover image analysis, received ${maxDuration}`);
+});

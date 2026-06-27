@@ -27,3 +27,10 @@ test("VideoGeneratorForm imports every duration planner used by interactive vide
     assert.ok(videoConfigImports.has(plannerName), `${plannerName} must be imported before its mode can render`);
   }
 });
+
+test("vertical format shows the Magic-inspired photo compatibility analyzer", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /import VerticalPhotoCompatibility from "@\/components\/video\/VerticalPhotoCompatibility"/);
+  assert.match(source, /format === "9:16"/);
+  assert.match(source, /<VerticalPhotoCompatibility imageUrls=\{verticalPreviewImageUrls\}/);
+});

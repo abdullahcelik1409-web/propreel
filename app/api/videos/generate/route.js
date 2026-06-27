@@ -16,7 +16,6 @@ import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
 import { premiumProviderFactory, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
 import { prepareReferenceImagesForVideo } from "@/lib/videoReferenceImageService";
-import { getProviderAspectRatioForOutput } from "@/lib/videoCanvasService";
 import { buildOverlayPlan } from "@/lib/text-templates/buildOverlayPlan.mjs";
 import {
   getTextTemplateVideoTemplateId,
@@ -57,19 +56,27 @@ import {
 } from "@/lib/videoConfig";
 
 function applyPreparedReferencesToPremiumScenePlan(scenePlan, referencePreparation) {
-  if (!referencePreparation?.processed) return scenePlan;
-
-  const urlMap = new Map(
-    referencePreparation.references.map((reference) => [reference.originalUrl, reference.processedUrl]),
+  const referenceMap = new Map(
+    (referencePreparation?.references || []).map((reference) => [reference.originalUrl, reference]),
   );
 
   return {
     ...scenePlan,
-    scenes: scenePlan.scenes.map((scene) => ({
-      ...scene,
-      sourcePhotoUrl: urlMap.get(scene.sourcePhotoUrl) || scene.sourcePhotoUrl,
-      targetPhotoUrl: urlMap.get(scene.targetPhotoUrl) || scene.targetPhotoUrl,
-    })),
+    outputAspectRatio: referencePreparation?.format,
+    scenes: scenePlan.scenes.map((scene) => {
+      const sourceReference = referenceMap.get(scene.sourcePhotoUrl) || null;
+      const targetReference = referenceMap.get(scene.targetPhotoUrl) || sourceReference;
+      const requiresVerticalCanvas = Boolean(
+        sourceReference?.requiresVerticalCanvas || targetReference?.requiresVerticalCanvas,
+      );
+      return {
+        ...scene,
+        sourceOrientation: sourceReference?.orientation || null,
+        targetOrientation: targetReference?.orientation || null,
+        providerAspectRatio: requiresVerticalCanvas ? "16:9" : referencePreparation?.format,
+        requiresVerticalCanvas,
+      };
+    }),
   };
 }
 
@@ -135,7 +142,6 @@ export async function POST(request) {
         ? VIDEO_MODE_MULTI_IMAGE
         : VIDEO_MODE_BASIC;
     const format = normalizeAspectRatio(body.format || DEFAULT_VIDEO_ASPECT_RATIO);
-    const providerAspectRatio = getProviderAspectRatioForOutput(format);
     const overlays = body.overlays || {};
     const templateId = body.templateId || body.style || DEFAULT_PROMPT_TEMPLATE_ID;
     const sceneTemplateId = normalizeSceneTemplateIdForMode(body.sceneTemplateId, videoMode);
@@ -317,7 +323,7 @@ export async function POST(request) {
       const referencePreparation = useRealProvider
         ? await prepareReferenceImagesForVideo({
           imageUrls: selectedImageUrls,
-          format: providerAspectRatio,
+          format,
           userId: user.id,
           jobId: reservedVideo.id,
         })
@@ -328,7 +334,7 @@ export async function POST(request) {
         bridgeFrameService,
         scenePlan: providerScenePlan,
         jobId: reservedVideo.id,
-        aspectRatio: providerAspectRatio,
+        aspectRatio: format,
       });
       generation.primaryJobId = generation.primaryJobId || generation.providerRequests[0]?.requestId || null;
 
@@ -378,6 +384,7 @@ export async function POST(request) {
         data: {
           status: "pending",
           falJobId: generation.primaryJobId,
+          scenePlan: providerScenePlan,
           providerRequests: generation.providerRequests,
           rawProviderResponse: {
             providerMode,
@@ -457,7 +464,7 @@ export async function POST(request) {
 
       const referencePreparation = await prepareReferenceImagesForVideo({
         imageUrls: selectedImageUrls,
-        format: providerAspectRatio,
+        format,
         userId: user.id,
         jobId: `multi-${randomUUID()}`,
       });
@@ -468,7 +475,8 @@ export async function POST(request) {
         sceneTemplateId,
         prompt: userPrompt,
         durationSeconds: duration,
-        aspectRatio: providerAspectRatio,
+        aspectRatio: format,
+        referenceImages: referencePreparation.references,
       });
 
       const video = await prisma.$transaction(async (tx) => {
@@ -572,13 +580,14 @@ export async function POST(request) {
 
     const referencePreparation = await prepareReferenceImagesForVideo({
       imageUrls: [imageUrl],
-      format: providerAspectRatio,
+      format,
       userId: user.id,
       jobId: reservedVideo.id,
     });
     const providerImageUrl = referencePreparation.imageUrls[0] || imageUrl;
+    const referenceStrategy = referencePreparation.references[0];
     const generation = await generatePropertyVideo([providerImageUrl], {
-      aspectRatio: providerAspectRatio,
+      aspectRatio: referenceStrategy?.providerAspectRatio || format,
       listing,
       prompt,
       templateId,
@@ -592,6 +601,7 @@ export async function POST(request) {
         rawProviderResponse: {
           ...(generation.raw && typeof generation.raw === "object" ? generation.raw : { raw: generation.raw }),
           referenceImages: referencePreparation,
+          outputFormatStrategy: referenceStrategy || null,
         },
       },
     });

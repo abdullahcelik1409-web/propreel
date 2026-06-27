@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { buildPremiumProviderInput } from "../lib/premiumVideoCore.mjs";
 import { normalizeAspectRatio } from "../lib/videoConfig.js";
 import { buildVerticalBlurCanvasFilterGraph, getProviderAspectRatioForOutput } from "../lib/videoCanvasService.js";
+import { classifyImageDimensions, getReferenceOutputStrategy } from "../lib/imageOrientation.js";
 import {
   prepareReferenceImagesForVideo,
   transformImageToVerticalCanvas,
@@ -17,8 +18,10 @@ test("normalizeAspectRatio accepts vertical aliases", () => {
   assert.equal(normalizeAspectRatio("16:9"), "16:9");
 });
 
-test("vertical output is generated horizontally before the app applies its guaranteed blur canvas", () => {
+test("vertical output selects provider ratio from the source image orientation", () => {
   assert.equal(getProviderAspectRatioForOutput("9:16"), "16:9");
+  assert.equal(getProviderAspectRatioForOutput("9:16", { orientation: "portrait" }), "9:16");
+  assert.equal(getProviderAspectRatioForOutput("9:16", { orientation: "landscape" }), "16:9");
   assert.equal(getProviderAspectRatioForOutput("16:9"), "16:9");
   assert.equal(getProviderAspectRatioForOutput("1:1"), "1:1");
 
@@ -30,6 +33,19 @@ test("vertical output is generated horizontally before the app applies its guara
 
   const recoveryGraph = buildVerticalBlurCanvasFilterGraph({ cropVerticalSourceToLandscape: true });
   assert.match(recoveryGraph, /crop=iw:iw\*9\/16:0:\(ih-oh\)\/2/);
+});
+
+test("image direction classification is deterministic around square tolerance", () => {
+  assert.equal(classifyImageDimensions(900, 1600), "portrait");
+  assert.equal(classifyImageDimensions(1600, 900), "landscape");
+  assert.equal(classifyImageDimensions(1000, 1020), "square");
+  assert.deepEqual(getReferenceOutputStrategy({ format: "9:16", width: 900, height: 1600 }), {
+    outputAspectRatio: "9:16",
+    providerAspectRatio: "9:16",
+    orientation: "portrait",
+    requiresVerticalCanvas: false,
+  });
+  assert.equal(getReferenceOutputStrategy({ format: "9:16", width: 1600, height: 900 }).requiresVerticalCanvas, true);
 });
 
 test("horizontal format keeps original image URLs without preprocessing", async () => {
@@ -46,31 +62,29 @@ test("horizontal format keeps original image URLs without preprocessing", async 
   assert.deepEqual(result.imageUrls, imageUrls);
 });
 
-test("vertical format returns processed URLs in the original order", async () => {
-  const calls = [];
+test("vertical format analyzes every image and preserves original URLs", async () => {
   const result = await prepareReferenceImagesForVideo({
     imageUrls: ["https://cdn.example.com/a.jpg", "https://cdn.example.com/b.jpg"],
     format: "9:16",
     userId: "user_1",
     jobId: "job_1",
     downloadImage: async (url) => Buffer.from(url),
-    transformImage: async (buffer) => Buffer.from(`vertical:${buffer.toString()}`),
-    uploadImage: async ({ imageBuffer, index }) => {
-      calls.push({ index, body: imageBuffer.toString() });
-      return {
-        url: `https://cdn.example.com/processed-${index}.jpg`,
-        storagePath: `processed-video-references/vertical/user_1/job_1/${index}.jpg`,
-      };
-    },
+    analyzeImage: async (_buffer, { index }) => index === 0
+      ? { width: 900, height: 1600, format: "jpeg", orientation: "portrait" }
+      : { width: 1600, height: 900, format: "jpeg", orientation: "landscape" },
   });
 
-  assert.equal(result.processed, true);
+  assert.equal(result.processed, false);
+  assert.equal(result.analyzed, true);
   assert.deepEqual(result.imageUrls, [
-    "https://cdn.example.com/processed-0.jpg",
-    "https://cdn.example.com/processed-1.jpg",
+    "https://cdn.example.com/a.jpg",
+    "https://cdn.example.com/b.jpg",
   ]);
-  assert.deepEqual(calls.map((call) => call.index), [0, 1]);
-  assert.match(calls[0].body, /vertical:https:\/\/cdn\.example\.com\/a\.jpg/);
+  assert.equal(result.references[0].providerAspectRatio, "9:16");
+  assert.equal(result.references[0].requiresVerticalCanvas, false);
+  assert.equal(result.references[1].providerAspectRatio, "16:9");
+  assert.equal(result.references[1].requiresVerticalCanvas, true);
+  assert.equal(result.requiresVerticalCanvas, true);
 });
 
 test("transformImageToVerticalCanvas creates a 1080x1920 JPEG", async () => {

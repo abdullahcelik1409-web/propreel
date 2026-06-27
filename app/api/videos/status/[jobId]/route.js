@@ -29,6 +29,27 @@ function getSafeErrorMessage(error, fallback = "Fal.ai video generation failed")
   return error?.message || error?.error || String(error || "") || fallback;
 }
 
+async function applyRequiredCanvasToProviderClips({ video, providerRequests, filePrefix }) {
+  const outputRequests = [];
+  for (let index = 0; index < providerRequests.length; index += 1) {
+    const request = providerRequests[index];
+    const canvas = await addOutputCanvasToFinalVideo({
+      video,
+      sourceVideoUrl: request.videoUrl,
+      shouldApply: Boolean(request.requiresVerticalCanvas),
+      storageFileName: `clips/${filePrefix}-${index + 1}-with-canvas.mp4`,
+      reason: request.requiresVerticalCanvas ? "non-portrait reference" : "native portrait reference",
+    });
+    outputRequests.push({
+      ...request,
+      providerVideoUrl: request.providerVideoUrl || request.videoUrl,
+      videoUrl: canvas.finalVideoUrl,
+      outputCanvas: canvas,
+    });
+  }
+  return outputRequests;
+}
+
 export async function GET(_request, { params }) {
   try {
     const user = await requireUser();
@@ -119,19 +140,20 @@ export async function GET(_request, { params }) {
 
       if (allCompleted) {
         try {
+          const outputRequests = await applyRequiredCanvasToProviderClips({
+            video,
+            providerRequests: checkedRequests,
+            filePrefix: "premium",
+          });
           const composition = await composePremiumVideoClips({
             jobId: video.id,
-            generatedClips: checkedRequests,
+            generatedClips: outputRequests,
             scenePlan: video.scenePlan,
             overlayData: video.overlays,
           });
-          const canvasResult = await addOutputCanvasToFinalVideo({
-            video,
-            sourceVideoUrl: composition.finalVideoUrl,
-          });
           const textOverlayResult = await addTextOverlaysToFinalVideo({
             video,
-            silentVideoUrl: canvasResult.finalVideoUrl,
+            silentVideoUrl: composition.finalVideoUrl,
           });
           const audioResult = await addBackgroundAudioToFinalVideo({
             video: { ...video, overlays: textOverlayResult.overlays },
@@ -143,14 +165,14 @@ export async function GET(_request, { params }) {
             data: {
               status: "completed",
               videoUrl: audioResult.finalVideoUrl,
-              providerRequests: checkedRequests,
+              providerRequests: outputRequests,
               overlays: audioResult.overlays,
               rawProviderResponse: {
-                providerRequests: checkedRequests,
+                providerRequests: outputRequests,
                 finalVideoUrl: audioResult.finalVideoUrl,
                 silentFinalVideoUrl: composition.finalVideoUrl,
                 composition,
-                canvas: canvasResult,
+                canvas: outputRequests.map((request) => request.outputCanvas),
                 textOverlayApplied: textOverlayResult.applied,
                 textOverlayFailed: textOverlayResult.failed,
                 textOverlayError: textOverlayResult.errorMessage || null,
@@ -270,19 +292,21 @@ export async function GET(_request, { params }) {
 
       if (allCompleted) {
         try {
-          const clipUrls = checkedRequests.map((request) => request.videoUrl);
+          const outputRequests = await applyRequiredCanvasToProviderClips({
+            video,
+            providerRequests: checkedRequests,
+            filePrefix: "multi-image",
+          });
+          const clipUrls = outputRequests.map((request) => request.videoUrl);
           const mergeResult = await mergeProviderVideoClipsWithXfadeFallback(clipUrls, {
             videoId: video.id,
             targetDurationSeconds: video.duration || 30,
             filePrefix: "multi-image",
-          });
-          const canvasResult = await addOutputCanvasToFinalVideo({
-            video,
-            sourceVideoUrl: mergeResult.finalVideoUrl,
+            outputAspectRatio: video.format,
           });
           const textOverlayResult = await addTextOverlaysToFinalVideo({
             video,
-            silentVideoUrl: canvasResult.finalVideoUrl,
+            silentVideoUrl: mergeResult.finalVideoUrl,
           });
           const audioResult = await addBackgroundAudioToFinalVideo({
             video: { ...video, overlays: textOverlayResult.overlays },
@@ -294,14 +318,14 @@ export async function GET(_request, { params }) {
             data: {
               status: "completed",
               videoUrl: audioResult.finalVideoUrl,
-              providerRequests: checkedRequests,
+              providerRequests: outputRequests,
               overlays: audioResult.overlays,
               rawProviderResponse: {
-                providerRequests: checkedRequests,
+                providerRequests: outputRequests,
                 finalVideoUrl: audioResult.finalVideoUrl,
                 silentFinalVideoUrl: mergeResult.finalVideoUrl,
                 merge: mergeResult,
-                canvas: canvasResult,
+                canvas: outputRequests.map((request) => request.outputCanvas),
                 textOverlayApplied: textOverlayResult.applied,
                 textOverlayFailed: textOverlayResult.failed,
                 textOverlayError: textOverlayResult.errorMessage || null,
@@ -361,7 +385,16 @@ export async function GET(_request, { params }) {
     if (normalizedStatus === "completed") {
       const result = await getResult(jobId);
       const videoUrl = getVideoUrlFromResult(result);
-      const canvasResult = await addOutputCanvasToFinalVideo({ video, sourceVideoUrl: videoUrl });
+      const existingRaw = video.rawProviderResponse && typeof video.rawProviderResponse === "object"
+        ? video.rawProviderResponse
+        : {};
+      const referenceStrategy = existingRaw.outputFormatStrategy || existingRaw.referenceImages?.references?.[0] || null;
+      const canvasResult = await addOutputCanvasToFinalVideo({
+        video,
+        sourceVideoUrl: videoUrl,
+        shouldApply: referenceStrategy?.requiresVerticalCanvas ?? true,
+        reason: referenceStrategy?.requiresVerticalCanvas ? "non-portrait reference" : "native portrait reference",
+      });
       const audioResult = await addBackgroundAudioToFinalVideo({
         video,
         silentVideoUrl: canvasResult.finalVideoUrl,
@@ -373,6 +406,7 @@ export async function GET(_request, { params }) {
           videoUrl: audioResult.finalVideoUrl,
           overlays: audioResult.overlays,
           rawProviderResponse: {
+            ...existingRaw,
             ...(result && typeof result === "object" ? result : { result }),
             finalVideoUrl: audioResult.finalVideoUrl,
             silentFinalVideoUrl: videoUrl,
@@ -393,9 +427,12 @@ export async function GET(_request, { params }) {
         rawProviderResponse: falStatus,
       });
     } else if (video.status === "pending") {
+      const existingRaw = video.rawProviderResponse && typeof video.rawProviderResponse === "object"
+        ? video.rawProviderResponse
+        : {};
       updated = await prisma.video.update({
         where: { id: video.id },
-        data: { status: "processing", rawProviderResponse: falStatus },
+        data: { status: "processing", rawProviderResponse: { ...existingRaw, falStatus } },
       });
     }
 
