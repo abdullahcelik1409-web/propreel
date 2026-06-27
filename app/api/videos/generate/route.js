@@ -16,6 +16,7 @@ import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
 import { premiumProviderFactory, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
 import { prepareReferenceImagesForVideo } from "@/lib/videoReferenceImageService";
+import { getProviderAspectRatioForOutput } from "@/lib/videoCanvasService";
 import { buildOverlayPlan } from "@/lib/text-templates/buildOverlayPlan.mjs";
 import {
   getTextTemplateVideoTemplateId,
@@ -134,6 +135,7 @@ export async function POST(request) {
         ? VIDEO_MODE_MULTI_IMAGE
         : VIDEO_MODE_BASIC;
     const format = normalizeAspectRatio(body.format || DEFAULT_VIDEO_ASPECT_RATIO);
+    const providerAspectRatio = getProviderAspectRatioForOutput(format);
     const overlays = body.overlays || {};
     const templateId = body.templateId || body.style || DEFAULT_PROMPT_TEMPLATE_ID;
     const sceneTemplateId = normalizeSceneTemplateIdForMode(body.sceneTemplateId, videoMode);
@@ -315,7 +317,7 @@ export async function POST(request) {
       const referencePreparation = useRealProvider
         ? await prepareReferenceImagesForVideo({
           imageUrls: selectedImageUrls,
-          format,
+          format: providerAspectRatio,
           userId: user.id,
           jobId: reservedVideo.id,
         })
@@ -326,7 +328,7 @@ export async function POST(request) {
         bridgeFrameService,
         scenePlan: providerScenePlan,
         jobId: reservedVideo.id,
-        aspectRatio: format,
+        aspectRatio: providerAspectRatio,
       });
       generation.primaryJobId = generation.primaryJobId || generation.providerRequests[0]?.requestId || null;
 
@@ -455,7 +457,7 @@ export async function POST(request) {
 
       const referencePreparation = await prepareReferenceImagesForVideo({
         imageUrls: selectedImageUrls,
-        format,
+        format: providerAspectRatio,
         userId: user.id,
         jobId: `multi-${randomUUID()}`,
       });
@@ -466,7 +468,7 @@ export async function POST(request) {
         sceneTemplateId,
         prompt: userPrompt,
         durationSeconds: duration,
-        aspectRatio: format,
+        aspectRatio: providerAspectRatio,
       });
 
       const video = await prisma.$transaction(async (tx) => {
@@ -570,13 +572,13 @@ export async function POST(request) {
 
     const referencePreparation = await prepareReferenceImagesForVideo({
       imageUrls: [imageUrl],
-      format,
+      format: providerAspectRatio,
       userId: user.id,
       jobId: reservedVideo.id,
     });
     const providerImageUrl = referencePreparation.imageUrls[0] || imageUrl;
     const generation = await generatePropertyVideo([providerImageUrl], {
-      aspectRatio: format,
+      aspectRatio: providerAspectRatio,
       listing,
       prompt,
       templateId,

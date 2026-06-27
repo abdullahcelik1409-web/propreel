@@ -4,6 +4,7 @@ import sharp from "sharp";
 
 import { buildPremiumProviderInput } from "../lib/premiumVideoCore.mjs";
 import { normalizeAspectRatio } from "../lib/videoConfig.js";
+import { buildVerticalBlurCanvasFilterGraph, getProviderAspectRatioForOutput } from "../lib/videoCanvasService.js";
 import {
   prepareReferenceImagesForVideo,
   transformImageToVerticalCanvas,
@@ -14,6 +15,21 @@ test("normalizeAspectRatio accepts vertical aliases", () => {
   assert.equal(normalizeAspectRatio("vertical"), "9:16");
   assert.equal(normalizeAspectRatio("portrait"), "9:16");
   assert.equal(normalizeAspectRatio("16:9"), "16:9");
+});
+
+test("vertical output is generated horizontally before the app applies its guaranteed blur canvas", () => {
+  assert.equal(getProviderAspectRatioForOutput("9:16"), "16:9");
+  assert.equal(getProviderAspectRatioForOutput("16:9"), "16:9");
+  assert.equal(getProviderAspectRatioForOutput("1:1"), "1:1");
+
+  const graph = buildVerticalBlurCanvasFilterGraph();
+  assert.match(graph, /scale=1080:1920:force_original_aspect_ratio=increase/);
+  assert.match(graph, /gblur=sigma=28/);
+  assert.match(graph, /scale=1080:1920:force_original_aspect_ratio=decrease/);
+  assert.match(graph, /overlay=\(W-w\)\/2:\(H-h\)\/2/);
+
+  const recoveryGraph = buildVerticalBlurCanvasFilterGraph({ cropVerticalSourceToLandscape: true });
+  assert.match(recoveryGraph, /crop=iw:iw\*9\/16:0:\(ih-oh\)\/2/);
 });
 
 test("horizontal format keeps original image URLs without preprocessing", async () => {

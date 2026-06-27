@@ -4,6 +4,7 @@ import { mergeProviderVideoClipsWithXfadeFallback } from "@/lib/videoMergeServic
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { addBackgroundAudioToFinalVideo } from "@/lib/videoAudioService";
 import { addTextOverlaysToFinalVideo } from "@/lib/videoTextOverlayService";
+import { addOutputCanvasToFinalVideo } from "@/lib/videoCanvasService";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { refundVideoGenerationCredits } from "@/lib/videoCreditService";
@@ -124,9 +125,13 @@ export async function GET(_request, { params }) {
             scenePlan: video.scenePlan,
             overlayData: video.overlays,
           });
+          const canvasResult = await addOutputCanvasToFinalVideo({
+            video,
+            sourceVideoUrl: composition.finalVideoUrl,
+          });
           const textOverlayResult = await addTextOverlaysToFinalVideo({
             video,
-            silentVideoUrl: composition.finalVideoUrl,
+            silentVideoUrl: canvasResult.finalVideoUrl,
           });
           const audioResult = await addBackgroundAudioToFinalVideo({
             video: { ...video, overlays: textOverlayResult.overlays },
@@ -145,6 +150,7 @@ export async function GET(_request, { params }) {
                 finalVideoUrl: audioResult.finalVideoUrl,
                 silentFinalVideoUrl: composition.finalVideoUrl,
                 composition,
+                canvas: canvasResult,
                 textOverlayApplied: textOverlayResult.applied,
                 textOverlayFailed: textOverlayResult.failed,
                 textOverlayError: textOverlayResult.errorMessage || null,
@@ -270,9 +276,13 @@ export async function GET(_request, { params }) {
             targetDurationSeconds: video.duration || 30,
             filePrefix: "multi-image",
           });
+          const canvasResult = await addOutputCanvasToFinalVideo({
+            video,
+            sourceVideoUrl: mergeResult.finalVideoUrl,
+          });
           const textOverlayResult = await addTextOverlaysToFinalVideo({
             video,
-            silentVideoUrl: mergeResult.finalVideoUrl,
+            silentVideoUrl: canvasResult.finalVideoUrl,
           });
           const audioResult = await addBackgroundAudioToFinalVideo({
             video: { ...video, overlays: textOverlayResult.overlays },
@@ -291,6 +301,7 @@ export async function GET(_request, { params }) {
                 finalVideoUrl: audioResult.finalVideoUrl,
                 silentFinalVideoUrl: mergeResult.finalVideoUrl,
                 merge: mergeResult,
+                canvas: canvasResult,
                 textOverlayApplied: textOverlayResult.applied,
                 textOverlayFailed: textOverlayResult.failed,
                 textOverlayError: textOverlayResult.errorMessage || null,
@@ -350,9 +361,10 @@ export async function GET(_request, { params }) {
     if (normalizedStatus === "completed") {
       const result = await getResult(jobId);
       const videoUrl = getVideoUrlFromResult(result);
+      const canvasResult = await addOutputCanvasToFinalVideo({ video, sourceVideoUrl: videoUrl });
       const audioResult = await addBackgroundAudioToFinalVideo({
         video,
-        silentVideoUrl: videoUrl,
+        silentVideoUrl: canvasResult.finalVideoUrl,
       });
       updated = await prisma.video.update({
         where: { id: video.id },
@@ -364,6 +376,7 @@ export async function GET(_request, { params }) {
             ...(result && typeof result === "object" ? result : { result }),
             finalVideoUrl: audioResult.finalVideoUrl,
             silentFinalVideoUrl: videoUrl,
+            canvas: canvasResult,
             audioFailed: audioResult.audioFailed,
           },
         },
