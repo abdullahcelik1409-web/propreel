@@ -5,12 +5,16 @@ import toast from "react-hot-toast";
 
 export default function VideoStatusPoller({ jobId, enabled = true, onComplete }) {
   const notified = useRef(false);
+  const inFlight = useRef(false);
 
   useEffect(() => {
     if (!enabled || !jobId) return undefined;
 
     let cancelled = false;
+    inFlight.current = false;
     const poll = async () => {
+      if (inFlight.current) return;
+      inFlight.current = true;
       try {
         const response = await fetch(`/api/videos/status/${jobId}`, { cache: "no-store" });
         if (!response.ok) return;
@@ -32,6 +36,8 @@ export default function VideoStatusPoller({ jobId, enabled = true, onComplete })
         }
       } catch {
         // Keep polling quietly; transient queue/network misses are expected.
+      } finally {
+        inFlight.current = false;
       }
     };
 

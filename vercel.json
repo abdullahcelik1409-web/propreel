@@ -6,7 +6,7 @@
       "maxDuration": 60
     },
     "app/api/videos/status/[jobId]/route.js": {
-      "maxDuration": 30
+      "maxDuration": 300
     }
   }
 }
