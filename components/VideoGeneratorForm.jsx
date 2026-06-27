@@ -8,6 +8,7 @@ import {
   DEFAULT_SCENE_TEMPLATE_ID,
   getDefaultSceneTemplateId,
   getMultiImageCreditCost,
+  getMultiImageScenePlan,
   getSceneTemplatesForMode,
   PREMIUM_GENERATE_ACTION,
   MULTI_IMAGE_DURATION_OPTIONS,
