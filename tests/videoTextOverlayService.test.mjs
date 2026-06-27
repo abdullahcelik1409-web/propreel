@@ -30,9 +30,11 @@ test("overlay SVG escapes property content and stays within ratio-aware width", 
 });
 
 test("ffmpeg filter graph uses planned timing and alpha fades", () => {
-  const graph = buildOverlayFilterGraph([overlay], [{ x: 120, y: 700 }], { width: 1920, height: 1080 });
+  const graph = buildOverlayFilterGraph([overlay], [{ x: 120, y: 700 }], { width: 1920, height: 1080 }, 30);
   assert.match(graph, /scale=1920:1080:force_original_aspect_ratio=decrease/);
   assert.match(graph, /pad=1920:1080/);
+  assert.match(graph, /tpad=stop_mode=clone:stop_duration=30/);
+  assert.match(graph, /trim=duration=30/);
   assert.match(graph, /fade=t=in:st=0.5:d=0.550:alpha=1/);
   assert.match(graph, /fade=t=out:st=5.550:d=0.450:alpha=1/);
   assert.match(graph, /between\(t,0.5,6\)/);
@@ -64,7 +66,7 @@ test("real ffmpeg binary renders the generated overlay graph on a synthetic loca
       "-y", "-f", "lavfi", "-i", "color=c=#0b1919:s=640x360:d=3:r=30",
       "-c:v", "libx264", "-pix_fmt", "yuv420p", sourcePath,
     ]);
-    const graph = buildOverlayFilterGraph([integrationOverlay], [{ x: 32, y: 170 }], { width: 640, height: 360 });
+    const graph = buildOverlayFilterGraph([integrationOverlay], [{ x: 32, y: 170 }], { width: 640, height: 360 }, 3);
     await runFfmpeg(ffmpegPath, [
       "-y", "-i", sourcePath, "-loop", "1", "-framerate", "30", "-i", overlayPath,
       "-filter_complex", graph, "-map", "[vout]", "-an", "-t", "3",
