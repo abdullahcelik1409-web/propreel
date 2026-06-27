@@ -14,7 +14,12 @@ const createNextConfig = (phase) => {
     serverExternalPackages: ['sharp'],
     outputFileTracingRoot: __dirname,
     outputFileTracingIncludes: {
-      '/api/videos/**/*': ['./node_modules/@ffmpeg-installer/**/*'],
+      '/api/videos/**/*': [
+        './node_modules/@ffmpeg-installer/**/*',
+        './node_modules/sharp/**/*',
+        './node_modules/@img/sharp-linux-x64/**/*',
+        './node_modules/@img/sharp-libvips-linux-x64/**/*',
+      ],
     },
     distDir: isDev || isVercel ? '.next' : '.next-build',
   };

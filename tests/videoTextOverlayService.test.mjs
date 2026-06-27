@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import sharp from "sharp";
 
-import { buildOverlayFilterGraph, buildOverlaySvg } from "../lib/videoTextOverlayService.js";
+import { buildOverlayFilterGraph, buildOverlaySvg, buildTextOverlayFallback } from "../lib/videoTextOverlayService.js";
 import { getFfmpegPath } from "../lib/ffmpegBinary.js";
 
 const overlay = {
@@ -39,6 +39,20 @@ test("ffmpeg filter graph uses planned timing and alpha fades", () => {
   assert.match(graph, /fade=t=out:st=5.550:d=0.450:alpha=1/);
   assert.match(graph, /between\(t,0.5,6\)/);
   assert.match(graph, /overlay=x=120:y=700/);
+});
+
+test("text overlay failure preserves the provider video instead of leaving the job pending", () => {
+  const fallback = buildTextOverlayFallback(
+    { id: "video_1", overlays: { textOverlayPlan: { overlays: [overlay] } } },
+    "https://cdn.example.com/provider-video.mp4",
+    new Error("sharp native runtime missing"),
+  );
+
+  assert.equal(fallback.finalVideoUrl, "https://cdn.example.com/provider-video.mp4");
+  assert.equal(fallback.applied, false);
+  assert.equal(fallback.failed, true);
+  assert.equal(fallback.overlays.textOverlayStatus, "failed");
+  assert.match(fallback.overlays.textOverlayErrorMessage, /sharp native runtime missing/);
 });
 
 function runFfmpeg(ffmpegPath, args) {
