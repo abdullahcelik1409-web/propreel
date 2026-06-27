@@ -3,6 +3,7 @@ import { checkJobStatus, getResult, getVideoUrlFromResult } from "@/lib/falVideo
 import { mergeProviderVideoClipsWithXfadeFallback } from "@/lib/videoMergeService";
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { addBackgroundAudioToFinalVideo } from "@/lib/videoAudioService";
+import { addTextOverlaysToFinalVideo } from "@/lib/videoTextOverlayService";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { refundVideoGenerationCredits } from "@/lib/videoCreditService";
@@ -123,9 +124,13 @@ export async function GET(_request, { params }) {
             scenePlan: video.scenePlan,
             overlayData: video.overlays,
           });
-          const audioResult = await addBackgroundAudioToFinalVideo({
+          const textOverlayResult = await addTextOverlaysToFinalVideo({
             video,
             silentVideoUrl: composition.finalVideoUrl,
+          });
+          const audioResult = await addBackgroundAudioToFinalVideo({
+            video: { ...video, overlays: textOverlayResult.overlays },
+            silentVideoUrl: textOverlayResult.finalVideoUrl,
           });
 
           updated = await prisma.video.update({
@@ -140,6 +145,7 @@ export async function GET(_request, { params }) {
                 finalVideoUrl: audioResult.finalVideoUrl,
                 silentFinalVideoUrl: composition.finalVideoUrl,
                 composition,
+                textOverlayApplied: textOverlayResult.applied,
                 audioFailed: audioResult.audioFailed,
               },
             },
@@ -262,9 +268,13 @@ export async function GET(_request, { params }) {
             targetDurationSeconds: video.duration || 30,
             filePrefix: "multi-image",
           });
-          const audioResult = await addBackgroundAudioToFinalVideo({
+          const textOverlayResult = await addTextOverlaysToFinalVideo({
             video,
             silentVideoUrl: mergeResult.finalVideoUrl,
+          });
+          const audioResult = await addBackgroundAudioToFinalVideo({
+            video: { ...video, overlays: textOverlayResult.overlays },
+            silentVideoUrl: textOverlayResult.finalVideoUrl,
           });
 
           updated = await prisma.video.update({
@@ -279,6 +289,7 @@ export async function GET(_request, { params }) {
                 finalVideoUrl: audioResult.finalVideoUrl,
                 silentFinalVideoUrl: mergeResult.finalVideoUrl,
                 merge: mergeResult,
+                textOverlayApplied: textOverlayResult.applied,
                 audioFailed: audioResult.audioFailed,
               },
             },

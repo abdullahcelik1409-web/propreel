@@ -16,6 +16,11 @@ import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { createPremiumBridgeFrameService } from "@/lib/premiumBridgeFrameService";
 import { premiumProviderFactory, submitPremiumVideoGeneration } from "@/lib/premiumVideoProvider";
 import { prepareReferenceImagesForVideo } from "@/lib/videoReferenceImageService";
+import { buildOverlayPlan } from "@/lib/text-templates/buildOverlayPlan.mjs";
+import {
+  getTextTemplateVideoTemplateId,
+  shouldEnableTextTemplates,
+} from "@/lib/text-templates/registry.mjs";
 import {
   recordVideoGenerationDebit,
   refundVideoGenerationCredits,
@@ -67,6 +72,55 @@ function applyPreparedReferencesToPremiumScenePlan(scenePlan, referencePreparati
   };
 }
 
+function resolveRequestedTextOverlayPlan({
+  listing,
+  videoMode,
+  duration,
+  sceneTemplateId,
+  sceneCount,
+  sceneConfig,
+  aspectRatio,
+  selectedTextTemplateId,
+}) {
+  const videoTemplateId = getTextTemplateVideoTemplateId({
+    videoMode,
+    duration,
+    sceneTemplateId,
+    sceneCount,
+  });
+  const enabled = shouldEnableTextTemplates({
+    videoMode,
+    duration,
+    sceneTemplateId,
+    sceneCount,
+  });
+
+  if (!enabled) {
+    return selectedTextTemplateId
+      ? { error: "Text styles are not supported for this single-scene video template.", plan: null }
+      : { error: null, plan: null };
+  }
+  if (!selectedTextTemplateId) {
+    return { error: "Select a compatible text style before generating this multi-scene video.", plan: null };
+  }
+
+  try {
+    return {
+      error: null,
+      plan: buildOverlayPlan({
+        property: listing,
+        duration,
+        videoTemplateId,
+        textTemplateId: selectedTextTemplateId,
+        aspectRatio,
+        sceneConfig,
+      }),
+    };
+  } catch (error) {
+    return { error: error?.message || "Selected text style is not compatible.", plan: null };
+  }
+}
+
 export async function POST(request) {
   let reservedVideo = null;
 
@@ -88,6 +142,9 @@ export async function POST(request) {
     const rawAudioTrackId = body.audio_track_id ?? body.audioTrackId;
     const audioTrackId = normalizeAudioTrackId(rawAudioTrackId);
     const audioMetadata = createInitialAudioMetadata(audioTrackId);
+    const selectedTextTemplateId = typeof body.selectedTextTemplateId === "string"
+      ? body.selectedTextTemplateId.trim()
+      : "";
 
     if (rawAudioTrackId && rawAudioTrackId !== "none" && !audioTrackId) {
       return ok({ success: false, error: "Selected audio track is not supported." }, { status: 400 });
@@ -172,6 +229,19 @@ export async function POST(request) {
         userPrompt,
         style: templateId,
       });
+      const textOverlayResult = resolveRequestedTextOverlayPlan({
+        listing,
+        videoMode,
+        duration: premiumVideoConfig.targetDurationSeconds,
+        sceneTemplateId,
+        sceneCount: scenePlan.sceneCount,
+        sceneConfig: scenePlan,
+        aspectRatio: format,
+        selectedTextTemplateId,
+      });
+      if (textOverlayResult.error) {
+        return ok({ success: false, error: textOverlayResult.error }, { status: 400 });
+      }
       const premiumOverlays = mergeAudioMetadataIntoOverlays({
         ...overlays,
         promptTemplateId: templateId,
@@ -179,6 +249,9 @@ export async function POST(request) {
         premiumProviderMode: providerMode,
         continuityMode: premiumVideoConfig.continuityMode,
         klingNativeAudio: "off",
+        selectedTextTemplateId: textOverlayResult.plan?.selectedTextTemplateId || null,
+        textOverlayPlan: textOverlayResult.plan,
+        textOverlayStatus: textOverlayResult.plan ? "planned" : "none",
       }, audioMetadata);
 
       reservedVideo = await prisma.$transaction(async (tx) => {
@@ -262,6 +335,7 @@ export async function POST(request) {
           jobId: reservedVideo.id,
           generatedClips: generation.providerRequests,
           scenePlan: providerScenePlan,
+          overlayData: premiumOverlays,
           mock: true,
         });
 
@@ -340,6 +414,19 @@ export async function POST(request) {
       }
       const selectedImageUrls = selectBestMultiImageUrls(listing.photos, requestedImageUrls);
       const scenePlan = getMultiImageScenePlan(duration);
+      const textOverlayResult = resolveRequestedTextOverlayPlan({
+        listing,
+        videoMode,
+        duration,
+        sceneTemplateId,
+        sceneCount: scenePlan.length,
+        sceneConfig: scenePlan,
+        aspectRatio: format,
+        selectedTextTemplateId,
+      });
+      if (textOverlayResult.error) {
+        return ok({ success: false, error: textOverlayResult.error }, { status: 400 });
+      }
       const prompt = buildMultiImagePropertyPrompt({
         listing,
         templateId,
@@ -406,6 +493,9 @@ export async function POST(request) {
               ...overlays,
               promptTemplateId: templateId,
               sceneTemplateId,
+              selectedTextTemplateId: textOverlayResult.plan?.selectedTextTemplateId || null,
+              textOverlayPlan: textOverlayResult.plan,
+              textOverlayStatus: textOverlayResult.plan ? "planned" : "none",
             }, audioMetadata),
             scenePlan,
             providerRequests: generation.providerRequests,
