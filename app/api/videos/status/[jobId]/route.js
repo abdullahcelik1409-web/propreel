@@ -3,7 +3,6 @@ import { checkJobStatus, getResult, getVideoUrlFromResult } from "@/lib/falVideo
 import { mergeProviderVideoClipsWithXfadeFallback } from "@/lib/videoMergeService";
 import { composePremiumVideoClips } from "@/lib/premiumCompositionService";
 import { addBackgroundAudioToFinalVideo } from "@/lib/videoAudioService";
-import { addTextOverlaysToFinalVideo } from "@/lib/videoTextOverlayService";
 import { addOutputCanvasToFinalVideo } from "@/lib/videoCanvasService";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -27,6 +26,20 @@ function normalizeFalStatus(status) {
 
 function getSafeErrorMessage(error, fallback = "Fal.ai video generation failed") {
   return error?.message || error?.error || String(error || "") || fallback;
+}
+
+function removeAnimatedTextOverlays(overlays) {
+  if (!overlays || typeof overlays !== "object") return overlays;
+
+  const nextOverlays = {
+    ...overlays,
+    selectedTextTemplateId: null,
+    textOverlayPlan: null,
+    textOverlayStatus: "disabled",
+    textOverlayErrorMessage: null,
+  };
+
+  return nextOverlays;
 }
 
 async function applyRequiredCanvasToProviderClips({ video, providerRequests, filePrefix }) {
@@ -151,13 +164,10 @@ export async function GET(_request, { params }) {
             scenePlan: video.scenePlan,
             overlayData: video.overlays,
           });
-          const textOverlayResult = await addTextOverlaysToFinalVideo({
-            video,
-            silentVideoUrl: composition.finalVideoUrl,
-          });
+          const overlaysWithoutAnimatedText = removeAnimatedTextOverlays(video.overlays);
           const audioResult = await addBackgroundAudioToFinalVideo({
-            video: { ...video, overlays: textOverlayResult.overlays },
-            silentVideoUrl: textOverlayResult.finalVideoUrl,
+            video: { ...video, overlays: overlaysWithoutAnimatedText },
+            silentVideoUrl: composition.finalVideoUrl,
           });
 
           updated = await prisma.video.update({
@@ -173,9 +183,10 @@ export async function GET(_request, { params }) {
                 silentFinalVideoUrl: composition.finalVideoUrl,
                 composition,
                 canvas: outputRequests.map((request) => request.outputCanvas),
-                textOverlayApplied: textOverlayResult.applied,
-                textOverlayFailed: textOverlayResult.failed,
-                textOverlayError: textOverlayResult.errorMessage || null,
+                textOverlayApplied: false,
+                textOverlayFailed: false,
+                textOverlayError: null,
+                textOverlayFeatureRemoved: true,
                 audioFailed: audioResult.audioFailed,
               },
             },
@@ -304,13 +315,10 @@ export async function GET(_request, { params }) {
             filePrefix: "multi-image",
             outputAspectRatio: video.format,
           });
-          const textOverlayResult = await addTextOverlaysToFinalVideo({
-            video,
-            silentVideoUrl: mergeResult.finalVideoUrl,
-          });
+          const overlaysWithoutAnimatedText = removeAnimatedTextOverlays(video.overlays);
           const audioResult = await addBackgroundAudioToFinalVideo({
-            video: { ...video, overlays: textOverlayResult.overlays },
-            silentVideoUrl: textOverlayResult.finalVideoUrl,
+            video: { ...video, overlays: overlaysWithoutAnimatedText },
+            silentVideoUrl: mergeResult.finalVideoUrl,
           });
 
           updated = await prisma.video.update({
@@ -326,9 +334,10 @@ export async function GET(_request, { params }) {
                 silentFinalVideoUrl: mergeResult.finalVideoUrl,
                 merge: mergeResult,
                 canvas: outputRequests.map((request) => request.outputCanvas),
-                textOverlayApplied: textOverlayResult.applied,
-                textOverlayFailed: textOverlayResult.failed,
-                textOverlayError: textOverlayResult.errorMessage || null,
+                textOverlayApplied: false,
+                textOverlayFailed: false,
+                textOverlayError: null,
+                textOverlayFeatureRemoved: true,
                 audioFailed: audioResult.audioFailed,
               },
             },

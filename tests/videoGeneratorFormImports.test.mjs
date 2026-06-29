@@ -18,14 +18,19 @@ function getNamedImports(source, moduleName) {
   );
 }
 
-test("VideoGeneratorForm imports every duration planner used by interactive video modes", async () => {
+test("VideoGeneratorForm imports the premium duration planner used by the premium flow", async () => {
   const source = await readFile(componentUrl, "utf8");
   const videoConfigImports = getNamedImports(source, "@/lib/videoConfig");
 
-  for (const plannerName of ["getMultiImageScenePlan", "getPremiumDurationPlan"]) {
-    assert.match(source, new RegExp(`\\b${plannerName}\\s*\\(`), `${plannerName} must be used by the form`);
-    assert.ok(videoConfigImports.has(plannerName), `${plannerName} must be imported before its mode can render`);
-  }
+  assert.match(source, /\bgetPremiumDurationPlan\s*\(/, "getPremiumDurationPlan must be used by the form");
+  assert.ok(videoConfigImports.has("getPremiumDurationPlan"), "getPremiumDurationPlan must be imported before its mode can render");
+});
+
+test("VideoGeneratorForm no longer renders animated text style controls", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.doesNotMatch(source, /TextTemplateSelector/);
+  assert.doesNotMatch(source, /selectedTextTemplateId/);
+  assert.doesNotMatch(source, /Text style/);
 });
 
 test("vertical format shows the Magic-inspired photo compatibility analyzer", async () => {

@@ -8,7 +8,6 @@ import {
   DEFAULT_SCENE_TEMPLATE_ID,
   getDefaultSceneTemplateId,
   getMultiImageCreditCost,
-  getMultiImageScenePlan,
   getSceneTemplatesForMode,
   PREMIUM_GENERATE_ACTION,
   MULTI_IMAGE_DURATION_OPTIONS,
@@ -26,13 +25,7 @@ import {
   VIDEO_GENERATION_DURATION_SECONDS,
 } from "@/lib/videoConfig";
 import { DEFAULT_AUDIO_BY_VIDEO_STYLE, NO_AUDIO_OPTION, NO_AUDIO_TRACK_ID } from "@/lib/audioConfig";
-import TextTemplateSelector from "@/components/video/TextTemplateSelector";
 import VerticalPhotoCompatibility from "@/components/video/VerticalPhotoCompatibility";
-import {
-  getAvailableTextTemplates,
-  getTextTemplateVideoTemplateId,
-  shouldEnableTextTemplates,
-} from "@/lib/text-templates/registry.mjs";
 
 const formats = [
   {
@@ -70,7 +63,6 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   const [selectedImageUrls, setSelectedImageUrls] = useState([]);
   const [templateId, setTemplateId] = useState(DEFAULT_PROMPT_TEMPLATE_ID);
   const [sceneTemplateId, setSceneTemplateId] = useState(DEFAULT_SCENE_TEMPLATE_ID);
-  const [selectedTextTemplateId, setSelectedTextTemplateId] = useState(null);
   const [audioTrackId, setAudioTrackId] = useState(DEFAULT_AUDIO_BY_VIDEO_STYLE[DEFAULT_PROMPT_TEMPLATE_ID] || NO_AUDIO_TRACK_ID);
   const [audioTouched, setAudioTouched] = useState(false);
   const [prompt, setPrompt] = useState("");
@@ -99,33 +91,7 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
   const selectedStyle = VIDEO_STYLE_TEMPLATES.find((template) => template.id === templateId);
   const selectedScene = availableSceneTemplates.find((template) => template.id === sceneTemplateId);
   const selectedAudio = availableAudioTracks.find((track) => track.audio_id === audioTrackId);
-  const textSceneConfig = useMemo(() => {
-    if (premiumSelected) return premiumDurationPlan?.valid ? premiumDurationPlan : null;
-    if (videoMode === VIDEO_MODE_MULTI_IMAGE) return getMultiImageScenePlan(multiImageDuration);
-    return null;
-  }, [premiumSelected, premiumDurationPlan, videoMode, multiImageDuration]);
-  const textTemplateDuration = premiumSelected ? premiumVideoConfig.targetDurationSeconds : multiImageDuration;
-  const textTemplateSceneCount = premiumSelected
-    ? premiumDurationPlan?.sceneCount || 0
-    : Array.isArray(textSceneConfig) ? textSceneConfig.length : 0;
-  const textTemplateVideoTemplateId = getTextTemplateVideoTemplateId({
-    videoMode,
-    duration: textTemplateDuration,
-    sceneTemplateId,
-    sceneCount: textTemplateSceneCount,
-  });
-  const textTemplatesEnabled = shouldEnableTextTemplates({
-    videoMode,
-    duration: textTemplateDuration,
-    sceneTemplateId,
-    sceneCount: textTemplateSceneCount,
-  });
-  const availableTextTemplates = useMemo(
-    () => getAvailableTextTemplates(textTemplateDuration, textTemplateVideoTemplateId),
-    [textTemplateDuration, textTemplateVideoTemplateId],
-  );
-  const selectedTextTemplate = availableTextTemplates.find((template) => template.id === selectedTextTemplateId);
-  const canGenerate = !loading && hasEnoughCredits && !!listing.photos?.length && hasValidPhotoSelection && (!textTemplatesEnabled || Boolean(selectedTextTemplate));
+  const canGenerate = !loading && hasEnoughCredits && !!listing.photos?.length && hasValidPhotoSelection;
   const verticalPreviewImageUrls = requiresPhotoSelection
     ? effectiveSelectedImages
     : (listing.photos || []).slice(0, 1);
@@ -175,16 +141,6 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
       setSceneTemplateId(normalizedSceneTemplateId || getDefaultSceneTemplateId(videoMode));
     }
   }, [sceneTemplateId, videoMode]);
-
-  useEffect(() => {
-    if (!textTemplatesEnabled) {
-      setSelectedTextTemplateId(null);
-      return;
-    }
-    if (!availableTextTemplates.some((template) => template.id === selectedTextTemplateId)) {
-      setSelectedTextTemplateId(availableTextTemplates[0]?.id || null);
-    }
-  }, [availableTextTemplates, selectedTextTemplateId, textTemplatesEnabled]);
 
   const toggle = (key) => setOverlays((prev) => ({ ...prev, [key]: !prev[key] }));
   const chooseVideoMode = (nextVideoMode) => {
@@ -239,7 +195,6 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           generationAction: PREMIUM_GENERATE_ACTION,
           prompt,
           overlays,
-          selectedTextTemplateId,
         }),
       });
       const rawResponse = await response.text();
@@ -493,19 +448,6 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
           )}
         </section>
 
-        {textTemplatesEnabled && textTemplateVideoTemplateId && textSceneConfig && (
-          <TextTemplateSelector
-            property={listing}
-            duration={textTemplateDuration}
-            videoTemplateId={textTemplateVideoTemplateId}
-            aspectRatio={format}
-            sceneConfig={textSceneConfig}
-            value={selectedTextTemplateId}
-            onChange={setSelectedTextTemplateId}
-            imageUrl={listing.photos?.[0]}
-          />
-        )}
-
         <section className="pr-section p-5">
           <p className="pr-kicker">Finishing</p>
           <h2 className="mt-1 text-xl font-bold">Overlays, music, and notes</h2>
@@ -575,7 +517,6 @@ export default function VideoGeneratorForm({ listing, userCredits, audioTracks =
             ["Format", format],
             ["Style", selectedStyle?.name || templateId],
             ["Scene", premiumSelected ? "Premium scene planner" : selectedScene?.name || sceneTemplateId],
-            ...(textTemplatesEnabled ? [["Text style", selectedTextTemplate?.name || "Select a style"]] : []),
             ["Music", selectedAudio?.label || "No music"],
             ...(premiumSelected ? [["Kling native audio", "Off"]] : []),
             ...(premiumSelected ? [["Continuity mode", "Enabled"]] : []),
