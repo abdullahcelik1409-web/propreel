@@ -93,9 +93,11 @@ export default function AuthForm({ mode, googleEnabled = false }) {
           <form onSubmit={submit} className={googleEnabled ? "space-y-4" : "mt-6 space-y-4"}>
             {isRegister && (
               <input
+                type="text"
                 value={form.name}
                 onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
                 placeholder="Name"
+                autoComplete="name"
                 className="pr-input px-4 py-3 text-sm"
               />
             )}
@@ -105,6 +107,7 @@ export default function AuthForm({ mode, googleEnabled = false }) {
               value={form.email}
               onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
               placeholder="Email"
+              autoComplete="email"
               className="pr-input px-4 py-3 text-sm"
             />
             <input
@@ -114,6 +117,7 @@ export default function AuthForm({ mode, googleEnabled = false }) {
               value={form.password}
               onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
               placeholder="Password"
+              autoComplete={isRegister ? "new-password" : "current-password"}
               className="pr-input px-4 py-3 text-sm"
             />
             {error && <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
