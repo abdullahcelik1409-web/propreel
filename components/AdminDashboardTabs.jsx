@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminCreditsForm from "@/components/AdminCreditsForm";
+import AdminDemoLinkBuilder from "@/components/AdminDemoLinkBuilder";
 import AdminFalCostsPanel from "@/components/AdminFalCostsPanel";
 import { formatStableDate } from "@/lib/dateFormatting";
 
@@ -19,7 +20,7 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
 
   return (
     <div className="space-y-6">
-      <div className="inline-flex rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-1">
+      <div className="inline-flex max-w-full overflow-x-auto rounded-2xl border border-[var(--pr-border-soft)] bg-[#071010] p-1" role="tablist" aria-label="Admin dashboard sections">
         <button
           type="button"
           onClick={() => setActiveTab("management")}
@@ -27,6 +28,8 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
             activeTab === "management" ? "bg-[var(--pr-cyan)] text-[#002020]" : "text-[var(--pr-muted)] hover:bg-[var(--pr-cyan-soft)] hover:text-white"
           }`}
           aria-pressed={activeTab === "management"}
+          role="tab"
+          aria-selected={activeTab === "management"}
         >
           Management
         </button>
@@ -37,8 +40,22 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
             activeTab === "usage" ? "bg-[var(--pr-cyan)] text-[#002020]" : "text-[var(--pr-muted)] hover:bg-[var(--pr-cyan-soft)] hover:text-white"
           }`}
           aria-pressed={activeTab === "usage"}
+          role="tab"
+          aria-selected={activeTab === "usage"}
         >
           Usage Costs
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("demo-links")}
+          className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-bold transition ${
+            activeTab === "demo-links" ? "bg-[var(--pr-cyan)] text-[#002020]" : "text-[var(--pr-muted)] hover:bg-[var(--pr-cyan-soft)] hover:text-white"
+          }`}
+          aria-pressed={activeTab === "demo-links"}
+          role="tab"
+          aria-selected={activeTab === "demo-links"}
+        >
+          Demo Links
         </button>
       </div>
 
@@ -136,8 +153,10 @@ export default function AdminDashboardTabs({ users = [], totalVideos = 0, credit
             </table>
           </div>
         </div>
-      ) : (
+      ) : activeTab === "usage" ? (
         <AdminFalCostsPanel />
+      ) : (
+        <AdminDemoLinkBuilder />
       )}
     </div>
   );
