@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { MARKETING_NAV_LINKS } from "@/lib/siteContent";
 import BrandLogo from "@/components/BrandLogo";
 
-export default async function MarketingNav() {
+export default async function MarketingNav({ signUpHref = "/auth/register" }) {
   const session = await getServerSession(authOptions);
 
   return (
@@ -29,7 +29,7 @@ export default async function MarketingNav() {
             <Link href="/auth/login" className="pr-secondary whitespace-nowrap px-3 py-2 text-sm font-semibold sm:px-4">
               Login
             </Link>
-            <Link href="/auth/register" className="whitespace-nowrap rounded-lg border border-[var(--pr-cyan)]/35 bg-[var(--pr-cyan-soft)] px-3 py-2 text-sm font-black text-[var(--pr-cyan)] transition hover:border-[var(--pr-cyan)] hover:bg-[rgba(0,251,251,0.16)] sm:px-4">
+            <Link href={signUpHref} className="whitespace-nowrap rounded-lg border border-[var(--pr-cyan)]/35 bg-[var(--pr-cyan-soft)] px-3 py-2 text-sm font-black text-[var(--pr-cyan)] transition hover:border-[var(--pr-cyan)] hover:bg-[rgba(0,251,251,0.16)] sm:px-4">
               Sign up
             </Link>
           </>

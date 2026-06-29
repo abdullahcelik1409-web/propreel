@@ -1,7 +1,7 @@
 import Script from "next/script";
 import MarketingNav from "@/components/MarketingNav";
 import DemoPageClient from "@/components/demo/DemoPageClient";
-import { getDemoVideos, pickDemoTrackingParams } from "@/lib/marketing/demoConfig";
+import { buildSignupUrl, getDemoVideos, pickDemoTrackingParams } from "@/lib/marketing/demoConfig";
 
 export const metadata = {
   title: "Viseo Demo - AI Real Estate Video Examples",
@@ -12,6 +12,7 @@ export default async function DemoPage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
   const demoVideos = getDemoVideos();
   const initialTrackingParams = pickDemoTrackingParams(resolvedSearchParams || {});
+  const signUpHref = buildSignupUrl(initialTrackingParams);
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
 
   return (
@@ -40,7 +41,7 @@ export default async function DemoPage({ searchParams }) {
       )}
 
       <div className="pr-shell min-h-screen overflow-hidden">
-        <MarketingNav />
+        <MarketingNav signUpHref={signUpHref} />
         <DemoPageClient demoVideos={demoVideos} initialTrackingParams={initialTrackingParams} />
       </div>
     </>

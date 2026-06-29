@@ -83,7 +83,7 @@ function DemoVideoCard({ demo, trackingParams, sessionId }) {
             controls
             playsInline
             preload="metadata"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover lg:object-contain"
             onError={() => setHasError(true)}
             onPlay={() => {
               if (playTrackedRef.current) return;
