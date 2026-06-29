@@ -69,6 +69,7 @@ function DemoVideoCard({ demo, trackingParams, sessionId }) {
   const [hasError, setHasError] = useState(!demo.videoUrl);
   const playTrackedRef = useRef(false);
   const halfTrackedRef = useRef(false);
+  const completeTrackedRef = useRef(false);
 
   return (
     <article className="pr-card overflow-hidden rounded-[28px] border border-[var(--pr-border-soft)] bg-[#071010]">
@@ -109,6 +110,8 @@ function DemoVideoCard({ demo, trackingParams, sessionId }) {
               }
             }}
             onEnded={() => {
+              if (completeTrackedRef.current) return;
+              completeTrackedRef.current = true;
               trackDemoEvent({
                 eventName: "demo_video_complete",
                 trackingParams,

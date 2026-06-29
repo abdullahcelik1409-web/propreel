@@ -27,6 +27,9 @@ test("demo page targets the existing register route and demo analytics events", 
   assert.match(clientSource, /Transparency note/);
   assert.match(clientSource, /demo_page_view/);
   assert.match(clientSource, /demo_video_50/);
+  assert.match(clientSource, /const completeTrackedRef = useRef\(false\)/);
+  assert.match(clientSource, /if \(completeTrackedRef\.current\) return/);
+  assert.match(clientSource, /completeTrackedRef\.current = true/);
   assert.match(clientSource, /demo_signup_click/);
   assert.match(clientSource, /object-cover lg:object-contain/);
   assert.match(navSource, /signUpHref = "\/auth\/register"/);
