@@ -152,6 +152,31 @@ model PaymentWebhookEvent {
   @@index([createdAt])
 }
 
+model DemoEvent {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId   String?  @map("session_id")
+  eventName   String   @map("event_name")
+  demoId      String?  @map("demo_id")
+  ctaId       String?  @map("cta_id")
+  utmSource   String?  @map("utm_source")
+  utmMedium   String?  @map("utm_medium")
+  utmCampaign String?  @map("utm_campaign")
+  utmContent  String?  @map("utm_content")
+  utmTerm     String?  @map("utm_term")
+  rid         String?
+  pagePath    String?  @map("page_path")
+  referrer    String?
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt], map: "demo_events_created_at_idx")
+  @@index([eventName], map: "demo_events_event_name_idx")
+  @@index([utmCampaign], map: "demo_events_utm_campaign_idx")
+  @@index([demoId], map: "demo_events_demo_id_idx")
+  @@index([rid], map: "demo_events_rid_idx")
+  @@map("demo_events")
+}
+
 model LemonSqueezyWebhookEvent {
   id               String    @id @default(cuid())
   eventId          String    @unique
